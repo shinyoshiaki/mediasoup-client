@@ -12,7 +12,7 @@
       "protocol": "inspector",
       "args": [
         "--project",
-        "${workspaceRoot}/client-node/tsconfig.json",
+        "${workspaceRoot}/tsconfig.json",
         "${workspaceRoot}/client-node/src/main.ts"
       ],
       "env": { "DEBUG": "*" },

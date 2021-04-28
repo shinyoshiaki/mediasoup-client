@@ -1,7 +1,7 @@
 import * as mediasoup from "../../src";
 import { MediaStreamTrack } from "../../src";
 import { socketPromise } from "./socket.io-promise";
-import { Producer } from "../../src/types";
+import { Producer, RtpCapabilities, Transport } from "../../src/types";
 import { Subject } from "rxjs";
 import io from "socket.io-client";
 import { createSocket } from "dgram";
@@ -27,7 +27,7 @@ export class Client {
       console.log("Disconnected");
     });
 
-    this.socket.on("connect_error", (error) => {
+    this.socket.on("connect_error", (error:Error) => {
       console.error("could not connect to %s%s (%s)", error.message);
     });
 
@@ -35,7 +35,7 @@ export class Client {
       console.log("newProducer");
     });
 
-    this.socket.on("produce", async (target) => {
+    this.socket.on("produce", async (target:string) => {
       console.log("produce");
       const stream = await this.subscribe(target);
       this.onSubscribe.next(stream);
@@ -161,12 +161,12 @@ export class Client {
       this.consume(target, transport);
     });
 
-  private loadDevice = async (routerRtpCapabilities) => {
+  private loadDevice = async (routerRtpCapabilities:RtpCapabilities) => {
     this.device = new mediasoup.Device();
     await this.device.load({ routerRtpCapabilities });
   };
 
-  private consume = async (target: string, transport) => {
+  private consume = async (target: string, transport:Transport) => {
     const { rtpCapabilities } = this.device;
     const data: any = await socketPromise(this.socket)("consume", {
       id: target,
@@ -174,15 +174,15 @@ export class Client {
     });
     const { producerId, id, kind, rtpParameters } = data;
 
-    let codecOptions = {};
+    
     const consumer = await transport.consume({
       id,
       producerId,
       kind,
       rtpParameters,
-      codecOptions,
+      
     });
-    const track: MediaStreamTrack = consumer.track;
+    const track: MediaStreamTrack = consumer.track as any;
     track.onReceiveRtp.subscribe((rtp) => {
       udp.send(rtp.serialize(), 4002, "127.0.0.1");
     });

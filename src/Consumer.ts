@@ -287,7 +287,7 @@ export class Consumer extends EnhancedEventEmitter
 
 	private _handleTrack(): void
 	{
-		this._track.addEventListener('ended', this._onTrackEnded);
+		// this._track.addEventListener('ended', this._onTrackEnded);
 	}
 
 	private _destroyTrack(): void

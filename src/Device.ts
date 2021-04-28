@@ -19,6 +19,7 @@ import { Edge11 } from './handlers/Edge11';
 import { ReactNative } from './handlers/ReactNative';
 import { RtpCapabilities, MediaKind } from './RtpParameters';
 import { SctpCapabilities } from './SctpParameters';
+import { Werift } from './handlers/werift';
 
 const logger = new Logger('Device');
 
@@ -31,7 +32,8 @@ export type BuiltinHandlerName =
 	| 'Safari12'
 	| 'Safari11'
 	| 'Edge11'
-	| 'ReactNative';
+	| 'ReactNative'
+	| "werift"
 
 export type DeviceOptions =
 {
@@ -168,9 +170,7 @@ export function detectDevice(): BuiltinHandlerName | undefined
 	// Unknown device.
 	else
 	{
-		logger.warn('this._detectDevice() | unknown device');
-
-		return undefined;
+		return "werift";
 	}
 }
 
@@ -271,6 +271,9 @@ export class Device
 				case 'ReactNative':
 					this._handlerFactory = ReactNative.createFactory();
 					break;
+				case 'werift':
+					this._handlerFactory = Werift.createFactory();
+					break
 				default:
 					throw new TypeError(`unknown handlerName "${handlerName}"`);
 			}

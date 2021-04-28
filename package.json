@@ -42,7 +42,8 @@
     "events": "^3.3.0",
     "h264-profile-level-id": "^1.0.1",
     "sdp-transform": "^2.14.1",
-    "supports-color": "^8.1.1"
+    "supports-color": "^8.1.1",
+    "werift": "^0.9.1"
   },
   "devDependencies": {
     "@types/sdp-transform": "^2.4.4",

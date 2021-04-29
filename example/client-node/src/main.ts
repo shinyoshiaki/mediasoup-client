@@ -1,7 +1,7 @@
-import * as mediasoup from "../../src";
-import { MediaStreamTrack } from "../../src";
+import * as mediasoup from "../../../src";
+import { MediaStreamTrack } from "../../../src";
 import { socketPromise } from "./socket.io-promise";
-import { Producer, RtpCapabilities, Transport } from "../../src/types";
+import { Producer, RtpCapabilities, Transport } from "../../../src/types";
 import { Subject } from "rxjs";
 import io from "socket.io-client";
 import { createSocket } from "dgram";

@@ -13,7 +13,6 @@
     "inlineSources": true,
     "noUnusedLocals": false,
     "skipLibCheck": true,
-    "strictNullChecks": true,
     "noImplicitAny": false
   },
   "include": ["src"]

@@ -1,6 +1,6 @@
 import * as mediasoup from "mediasoup-client";
 import { socketPromise } from "./socket.io-promise";
-import { Producer } from "mediasoup-client/lib/types";
+import { Producer, Transport } from "mediasoup-client/lib/types";
 import { Subject } from "rxjs";
 
 export class Client {
@@ -8,11 +8,9 @@ export class Client {
   producer: Producer;
   onSubscribe = new Subject<MediaStream>();
 
-  constructor(private socket: SocketIOClient.Socket) {
-    this.connect();
-  }
+  constructor(private socket: SocketIOClient.Socket) {}
 
-  private connect = async () => {
+  connect = async () => {
     const data = await socketPromise(this.socket)("getRouterRtpCapabilities");
     console.log(data);
     await this.loadDevice(data);
@@ -34,13 +32,15 @@ export class Client {
       const stream = await this.subscribe(target);
       this.onSubscribe.next(stream);
     });
+
+    return this;
   };
 
   publish = (stream: MediaStream) =>
     new Promise<void>(async (r) => {
       console.log("publish");
       const transportInfo: any = await socketPromise(this.socket)(
-        "createTransport",
+        "createProducerTransport",
         {
           forceTcp: false,
           rtpCapabilities: this.device.rtpCapabilities,
@@ -87,15 +87,12 @@ export class Client {
         switch (state) {
           case "connecting":
             break;
-
           case "connected":
             r();
             break;
-
           case "failed":
             transport.close();
             break;
-
           default:
             break;
         }
@@ -110,9 +107,12 @@ export class Client {
 
   subscribe = (target: string) =>
     new Promise<MediaStream>(async (r) => {
-      const data: any = await socketPromise(this.socket)("createTransport", {
-        forceTcp: false,
-      });
+      const data: any = await socketPromise(this.socket)(
+        "createConsumerTransport",
+        {
+          forceTcp: false,
+        }
+      );
       if (data.error) {
         console.error(data.error);
         return;
@@ -137,17 +137,13 @@ export class Client {
         switch (state) {
           case "connecting":
             break;
-
           case "connected":
             r(await stream);
             await socketPromise(this.socket)("resume");
             break;
-
           case "failed":
             transport.close();
-
             break;
-
           default:
             break;
         }
@@ -161,7 +157,7 @@ export class Client {
     await this.device.load({ routerRtpCapabilities });
   };
 
-  private consume = async (target: string, transport) => {
+  private consume = async (target: string, transport: Transport) => {
     const { rtpCapabilities } = this.device;
     const data: any = await socketPromise(this.socket)("consume", {
       id: target,
@@ -169,13 +165,11 @@ export class Client {
     });
     const { producerId, id, kind, rtpParameters } = data;
 
-    let codecOptions = {};
     const consumer = await transport.consume({
       id,
       producerId,
       kind,
       rtpParameters,
-      codecOptions,
     });
     const stream = new MediaStream();
     stream.addTrack(consumer.track);

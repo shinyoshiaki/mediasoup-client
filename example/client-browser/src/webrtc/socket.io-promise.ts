@@ -1,8 +1,5 @@
 // Adds support for Promise to socket.io-client
-export function socketPromise(socket: any) {
-  return function request(type: any, data = {}) {
-    return new Promise<any>((resolve) => {
-      socket.emit(type, data, resolve);
-    });
-  };
-}
+export const socketPromise = (socket: SocketIOClient.Socket) => <T>(type: any, data = {}) =>
+  new Promise<T>((resolve) => {
+    socket.emit(type, data, resolve);
+  });

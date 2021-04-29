@@ -1,5 +1,3 @@
-import WebRTC from "webrtc4me";
-import Event from "rx.mini";
 import socketClient from "socket.io-client";
 
 export class Signaling {

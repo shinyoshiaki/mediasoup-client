@@ -18,7 +18,8 @@ export class SFU {
   webServer?: http.Server;
   producers = new Map<string, Producer>();
   consumers = new Map<string, Consumer>();
-  transports = new Map<string, WebRtcTransport>();
+  producerTransports = new Map<string, WebRtcTransport>();
+  consumerTransports = new Map<string, WebRtcTransport>();
   mediasoupRouter?: Router;
   onProduce = new Subject<string>();
 
@@ -35,14 +36,25 @@ export class SFU {
       callback(this.mediasoupRouter?.rtpCapabilities);
     });
 
-    socket.on("transportList", (_, callback) => {
-      callback([...this.transports.keys()]);
+    socket.on("producerTransportList", (_, callback) => {
+      callback([...this.producerTransports.keys()]);
     });
 
-    socket.on("createTransport", async (_, callback) => {
+    socket.on("createProducerTransport", async (_, callback) => {
       try {
         const { transport, params } = await this.createWebRtcTransport();
-        this.transports.set(socket.id, transport);
+        this.producerTransports.set(socket.id, transport);
+        callback(params);
+      } catch (err) {
+        console.error(err);
+        callback({ error: err.message });
+      }
+    });
+
+    socket.on("createConsumerTransport", async (_, callback) => {
+      try {
+        const { transport, params } = await this.createWebRtcTransport();
+        this.consumerTransports.set(socket.id, transport);
         callback(params);
       } catch (err) {
         console.error(err);
@@ -51,22 +63,22 @@ export class SFU {
     });
 
     socket.on("connectProducerTransport", async (data, callback) => {
-      await this.transports.get(socket.id)?.connect({
+      await this.producerTransports.get(socket.id)?.connect({
         dtlsParameters: data.dtlsParameters,
-      });
+      }).catch(console.log);
       callback();
     });
 
     socket.on("connectConsumerTransport", async (data, callback) => {
-      await this.transports.get(socket.id)?.connect({
+      await this.consumerTransports.get(socket.id)?.connect({
         dtlsParameters: data.dtlsParameters,
-      });
+      }).catch(console.log);
       callback();
     });
 
     socket.on("produce", async (data, callback) => {
       const { kind, rtpParameters } = data;
-      const producer = await this.transports.get(socket.id)!.produce({
+      const producer = await this.producerTransports.get(socket.id)!.produce({
         kind,
         rtpParameters,
       });
@@ -90,6 +102,11 @@ export class SFU {
       await this.consumers.get(socket.id)!.resume();
       callback();
     });
+  }
+
+  disconnect(id:string){
+    this.producerTransports.delete(id)
+    this.consumerTransports.delete(id)
   }
 
   async runMediasoupWorker() {
@@ -155,7 +172,7 @@ export class SFU {
       return;
     }
     try {
-      const consumer = await this.transports.get(id)?.consume({
+      const consumer = await this.consumerTransports.get(id)?.consume({
         producerId: producer.id,
         rtpCapabilities,
         paused: producer.kind === "video",

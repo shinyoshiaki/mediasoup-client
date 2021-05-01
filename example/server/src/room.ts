@@ -13,13 +13,20 @@ export class Room {
 
   async init() {
     await this.sfu.runMediasoupWorker();
-    this.sfu.onProduce.subscribe((id) => {
-      console.log("produce", id);
-      this.guestsSockets
-        .filter((socket) => socket.id != id)
+    this.sfu.onProduce.subscribe((producerId) => {
+      console.log("produce", producerId);
+      this.guestsSockets        
         .forEach((socket) => {
-          console.log("emit produce", socket.id);
-          socket.emit("produce", socket.id);
+          console.log("emit produce", producerId);
+          socket.emit("produce", producerId);
+        });
+    });
+    this.sfu.onProduceData.subscribe((producerId) => {
+      console.log("produce", producerId);
+      this.guestsSockets        
+        .forEach((socket) => {
+          console.log("emit produceData", producerId);
+          socket.emit("produceData", producerId);
         });
     });
   }

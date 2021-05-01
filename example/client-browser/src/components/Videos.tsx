@@ -1,13 +1,14 @@
-import React, { FC, useEffect, useState, useRef } from "react";
+import { FC, useEffect, useState, useRef } from "react";
 import Event from "rx.mini";
 
-const Videos: FC<{ streamEvent: Event<MediaStream[]> }> = ({ streamEvent }) => {
+const Videos: FC<{ streamEvent: Event<[MediaStream[]]> }> = ({
+  streamEvent,
+}) => {
   const [streams, setstreams] = useState<MediaStream[]>([]);
   const videos = useRef<HTMLVideoElement[]>([]);
 
   useEffect(() => {
     streamEvent.subscribe((stream) => {
-      console.log({ stream });
       setstreams((prev) => [...prev, ...stream]);
     });
   }, []);

@@ -9,6 +9,12 @@ import {
   Consumer,
   Producer,
   RtpCapabilities,
+  DataProducer,
+  DataConsumer,
+  DataProducerOptions,
+  RtpParameters,
+  MediaKind,
+  DtlsParameters,
 } from "mediasoup/lib/types";
 import config from "./config";
 import { Subject } from "rxjs";
@@ -16,15 +22,24 @@ import { Subject } from "rxjs";
 export class SFU {
   worker?: Worker;
   webServer?: http.Server;
+  socketProducers = new Map<string, string[]>();
   producers = new Map<string, Producer>();
+  dataProducers = new Map<string, DataProducer>();
   consumers = new Map<string, Consumer>();
+  dataConsumers = new Map<string, DataConsumer>();
   producerTransports = new Map<string, WebRtcTransport>();
   consumerTransports = new Map<string, WebRtcTransport>();
   mediasoupRouter?: Router;
   onProduce = new Subject<string>();
+  onProduceData = new Subject<string>();
 
   listen(socket: Socket) {
+    this.socketProducers.set(socket.id, []);
     socket.on("disconnect", () => {
+      this.socketProducers.get(socket.id)?.forEach((id) => {
+        this.producers.delete(id);
+        this.dataProducers.delete(id);
+      });
       console.log("client disconnected");
     });
 
@@ -36,8 +51,12 @@ export class SFU {
       callback(this.mediasoupRouter?.rtpCapabilities);
     });
 
-    socket.on("producerTransportList", (_, callback) => {
-      callback([...this.producerTransports.keys()]);
+    socket.on("producerList", (_, callback) => {
+      callback([...this.producers.keys()]);
+    });
+
+    socket.on("dataProducerList", (_, callback) => {
+      callback([...this.dataProducers.keys()]);
     });
 
     socket.on("createProducerTransport", async (_, callback) => {
@@ -63,50 +82,101 @@ export class SFU {
     });
 
     socket.on("connectProducerTransport", async (data, callback) => {
-      await this.producerTransports.get(socket.id)?.connect({
-        dtlsParameters: data.dtlsParameters,
-      }).catch(console.log);
+      await this.producerTransports
+        .get(socket.id)
+        ?.connect({
+          dtlsParameters: data.dtlsParameters,
+        })
+        .catch(console.log);
       callback();
     });
 
-    socket.on("connectConsumerTransport", async (data, callback) => {
-      await this.consumerTransports.get(socket.id)?.connect({
-        dtlsParameters: data.dtlsParameters,
-      }).catch(console.log);
-      callback();
-    });
+    socket.on(
+      "connectConsumerTransport",
+      async (
+        { dtlsParameters }: { dtlsParameters: DtlsParameters },
+        callback
+      ) => {
+        await this.consumerTransports
+          .get(socket.id)
+          ?.connect({
+            dtlsParameters: dtlsParameters,
+          })
+          .catch(console.log);
+        callback();
+      }
+    );
 
-    socket.on("produce", async (data, callback) => {
-      const { kind, rtpParameters } = data;
-      const producer = await this.producerTransports.get(socket.id)!.produce({
-        kind,
-        rtpParameters,
-      });
-      this.producers.set(socket.id, producer);
+    socket.on(
+      "produce",
+      async (
+        {
+          kind,
+          rtpParameters,
+        }: {
+          kind: MediaKind;
+          rtpParameters: RtpParameters;
+        },
+        callback
+      ) => {
+        const producer = await this.producerTransports.get(socket.id)!.produce({
+          kind,
+          rtpParameters,
+        });
+        this.producers.set(producer.id, producer);
+        this.socketProducers.get(socket.id)?.push(producer.id);
+        callback({ id: producer.id });
+
+        this.onProduce.next(producer.id);
+      }
+    );
+
+    socket.on("produceData", async (data: DataProducerOptions, callback) => {
+      const producer = await this.producerTransports
+        .get(socket.id)!
+        .produceData(data);
+      this.dataProducers.set(producer.id, producer);
+      this.socketProducers.get(socket.id)?.push(producer.id);
       callback({ id: producer.id });
 
-      this.onProduce.next(socket.id);
+      this.onProduceData.next(producer.id);
     });
 
-    socket.on("consume", async (data, callback) => {
-      callback(
-        await this.createConsumer(
-          socket.id,
-          this.producers.get(data.id)!,
-          data.rtpCapabilities
-        )
-      );
-    });
+    socket.on(
+      "consume",
+      async (
+        {
+          producerId,
+          rtpCapabilities,
+        }: { producerId: string; rtpCapabilities: RtpCapabilities },
+        callback
+      ) => {
+        callback(
+          await this.createConsumer(
+            socket.id,
+            this.producers.get(producerId)!,
+            rtpCapabilities
+          )
+        );
+      }
+    );
 
-    socket.on("resume", async (data, callback) => {
-      await this.consumers.get(socket.id)!.resume();
-      callback();
-    });
+    socket.on(
+      "consumeData",
+      async ({ producerId }: { producerId: string }, callback) => {
+        callback(
+          await this.createDataConsumer(
+            socket.id,
+            this.dataProducers.get(producerId)!
+          )
+        );
+      }
+    );
   }
 
-  disconnect(id:string){
-    this.producerTransports.delete(id)
-    this.consumerTransports.delete(id)
+  disconnect(socketId: string) {
+    this.producerTransports.delete(socketId);
+    this.consumerTransports.delete(socketId);
   }
 
   async runMediasoupWorker() {
@@ -132,14 +202,16 @@ export class SFU {
     const {
       maxIncomingBitrate,
       initialAvailableOutgoingBitrate,
+      listenIps,
     } = config.mediasoup.webRtcTransport;
 
     const transport = await this.mediasoupRouter?.createWebRtcTransport({
-      listenIps: config.mediasoup.webRtcTransport.listenIps as any,
+      listenIps: listenIps as any,
       enableUdp: true,
       enableTcp: true,
       preferUdp: true,
       initialAvailableOutgoingBitrate,
+      enableSctp: true,
     })!;
     if (maxIncomingBitrate) {
       try {
@@ -153,12 +225,13 @@ export class SFU {
         iceParameters: transport.iceParameters,
         iceCandidates: transport.iceCandidates,
         dtlsParameters: transport.dtlsParameters,
+        sctpParameters: transport.sctpParameters,
       },
     };
   }
 
   private async createConsumer(
-    id: string,
+    socketId: string,
     producer: Producer,
     rtpCapabilities: RtpCapabilities
   ) {
@@ -172,25 +245,36 @@ export class SFU {
       return;
     }
     try {
-      const consumer = await this.consumerTransports.get(id)?.consume({
+      const consumer = await this.consumerTransports.get(socketId)?.consume({
         producerId: producer.id,
         rtpCapabilities,
-        paused: producer.kind === "video",
       })!;
-      this.consumers.set(id, consumer);
-      if (consumer.type === "simulcast") {
-        await consumer.setPreferredLayers({
-          spatialLayer: 2,
-          temporalLayer: 2,
-        });
-      }
+      this.consumers.set(consumer.id, consumer);
       return {
         producerId: producer.id,
         id: consumer.id,
         kind: consumer.kind,
         rtpParameters: consumer.rtpParameters,
-        type: consumer.type,
-        producerPaused: consumer.producerPaused,
+      };
+    } catch (error) {
+      console.error("consume failed", error);
+      return;
+    }
+  }
+
+  private async createDataConsumer(socketId: string, producer: DataProducer) {
+    try {
+      const consumer = await this.consumerTransports
+        .get(socketId)
+        ?.consumeData({
+          dataProducerId: producer.id,
+        })!;
+
+      this.dataConsumers.set(consumer.id, consumer);
+      return {
+        dataProducerId: producer.id,
+        id: consumer.id,
+        sctpStreamParameters: consumer.sctpStreamParameters,
       };
     } catch (error) {
       console.error("consume failed", error);

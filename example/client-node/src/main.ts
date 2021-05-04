@@ -21,6 +21,17 @@ socket.on("connect", async () => {
   await client.setupConsumerTransport();
   await client.setupProducerTransport();
 
+  client.onSubscribeMedia.subscribe((track)=>{
+    (track as unknown as MediaStreamTrack).onReceiveRtp.subscribe((rtp) => {
+      udp.send(rtp.serialize(), 4002);
+    });
+  })
+  client.onSubscribeData.subscribe((c)=>{
+    c.on("message", (data) => {
+      console.log({ data });
+    });
+  })
+
   {
     const targets = await socketPromise(socket)("producerList");
     console.log("media targets", targets);

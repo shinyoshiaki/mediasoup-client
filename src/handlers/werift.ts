@@ -45,6 +45,7 @@ export class Werift extends HandlerInterface {
     RTCRtpTransceiver
   > = new Map();
   private _hasDataChannelMediaSection = false;
+  private _nextSendSctpStreamId = 0;
   private _transportReady = false;
 
   static createFactory() {
@@ -209,7 +210,6 @@ export class Werift extends HandlerInterface {
   // @ts-expect-error
   async getSenderStats(localId: string): Promise<RTCStatsReport> {}
 
-  // todo impl
   async sendDataChannel({
     ordered,
     maxPacketLifeTime,
@@ -217,8 +217,71 @@ export class Werift extends HandlerInterface {
     label,
     protocol,
     priority,
-  }: // @ts-expect-error
-  HandlerSendDataChannelOptions): Promise<HandlerSendDataChannelResult> {}
+  }: 
+  HandlerSendDataChannelOptions): Promise<HandlerSendDataChannelResult> {
+    this._assertSendDirection();
+
+    const options =
+		{
+			negotiated : true,
+			id         : this._nextSendSctpStreamId,
+			ordered,
+			maxPacketLifeTime,
+			maxRetransmits,
+			protocol,
+			priority
+		};
+
+    logger.debug('sendDataChannel() [options:%o]', options);
+
+		const dataChannel = this._pc.createDataChannel(label||"", options);
+
+    // Increase next id.
+		this._nextSendSctpStreamId =
+    ++this._nextSendSctpStreamId % SCTP_NUM_STREAMS.MIS;
+
+    		// If this is the first DataChannel we need to create the SDP answer with
+		// m=application section.
+		if (!this._hasDataChannelMediaSection)
+		{
+			const offer = await this._pc.createOffer();
+			const localSdpObject = sdpTransform.parse(offer.sdp);
+			const offerMediaObject = localSdpObject.media
+				.find((m: any) => m.type === 'application');
+
+			if (!this._transportReady)
+				await this._setupTransport({ localDtlsRole: 'server', localSdpObject });
+
+			logger.debug(
+				'sendDataChannel() | calling pc.setLocalDescription() [offer:%o]',
+				offer);
+
+			await this._pc.setLocalDescription(offer);
+
+			this._remoteSdp!.sendSctpAssociation({ offerMediaObject });
+
+			const answer = { type: 'answer', sdp: this._remoteSdp!.getSdp() } as const;
+
+			logger.debug(
+				'sendDataChannel() | calling pc.setRemoteDescription() [answer:%o]',
+				answer);
+
+			await this._pc.setRemoteDescription(answer);
+
+			this._hasDataChannelMediaSection = true;
+		}
+
+
+		const sctpStreamParameters: SctpStreamParameters =
+		{
+			streamId          : options.id,
+			ordered           : options.ordered,
+			maxPacketLifeTime : options.maxPacketLifeTime,
+			maxRetransmits    : options.maxRetransmits
+		};
+
+		return { dataChannel:dataChannel as any, sctpStreamParameters };
+  }
 
   async receive({
     trackId,

@@ -21,16 +21,16 @@ socket.on("connect", async () => {
   await client.setupConsumerTransport();
   await client.setupProducerTransport();
 
-  client.onSubscribeMedia.subscribe((track)=>{
-    (track as unknown as MediaStreamTrack).onReceiveRtp.subscribe((rtp) => {
+  client.onSubscribeMedia.subscribe((track) => {
+    ((track as unknown) as MediaStreamTrack).onReceiveRtp.subscribe((rtp) => {
       udp.send(rtp.serialize(), 4002);
     });
-  })
-  client.onSubscribeData.subscribe((c)=>{
+  });
+  client.onSubscribeData.subscribe((c) => {
     c.on("message", (data) => {
       console.log({ data });
     });
-  })
+  });
 
   {
     const targets = await socketPromise(socket)("producerList");
@@ -53,4 +53,9 @@ socket.on("connect", async () => {
       });
     }
   }
+
+  const producer = await client.publishData();
+  setInterval(() => {
+    producer.send("werift");
+  }, 1000);
 });

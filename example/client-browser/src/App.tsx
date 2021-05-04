@@ -26,8 +26,10 @@ const APP: FC = () => {
     await client.setupProducerTransport();
     console.log("setup ProducerTransport done");
 
-    client.onSubscribeMedia.subscribe((stream) => {
-      mediaEvent.stream.execute(stream);
+    client.onSubscribeMedia.subscribe((track) => {
+      const stream = new MediaStream();
+      stream.addTrack(track);
+      mediaEvent.stream.execute([stream]);
     });
     client.onSubscribeData.subscribe((consumer) => {
       consumer.on("message", (data) => {
@@ -40,7 +42,12 @@ const APP: FC = () => {
         "producerList"
       );
       const streams = await Promise.all(
-        targets.map((target) => client.consume(target))
+        targets.map(async (target) => {
+          const track = await client.consume(target);
+          const stream = new MediaStream();
+          stream.addTrack(track);
+          return stream;
+        })
       );
       mediaEvent.stream.execute(streams);
     }
@@ -69,7 +76,7 @@ const APP: FC = () => {
     await client.publishMedia(track);
   };
 
-  const publish = async () => {
+  const publishData = async () => {
     const client = clientRef.current;
     producerRef.current = await client.publishData();
   };
@@ -84,7 +91,7 @@ const APP: FC = () => {
       <button onClick={connect}>connect</button>
       <button onClick={publishMedia}>publish video</button>
       <Videos streamEvent={mediaEventRef.current.stream} />
-      <button onClick={publish}>publish data</button>
+      <button onClick={publishData}>publish data</button>
       <button onClick={send}>send</button>
     </div>
   );

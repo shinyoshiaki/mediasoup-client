@@ -1,13 +1,14 @@
-import * as mediasoup from "mediasoup-client";
+import * as mediasoup from "../../../src";
+import { DataConsumer, RtpCapabilities, Transport } from "../../../src/types";
 import { socketPromise } from "./socket.io-promise";
-import { DataConsumer, Transport } from "mediasoup-client/lib/types";
 import Event from "rx.mini";
 
 export class Client {
-  device: mediasoup.Device;
+  device!: mediasoup.Device;
   onSubscribeMedia = new Event<[MediaStreamTrack]>();
   onSubscribeData = new Event<[DataConsumer]>();
 
+  //@ts-ignore
   constructor(private socket: SocketIOClient.Socket) {}
 
   connect = async () => {
@@ -19,7 +20,7 @@ export class Client {
       console.log("Disconnected");
     });
 
-    this.socket.on("connect_error", (error) => {
+    this.socket.on("connect_error", (error:Error) => {
       console.error("could not connect to %s%s (%s)", error.message);
     });
 
@@ -34,13 +35,13 @@ export class Client {
 
     this.socket.on("produceData", async (target: string) => {
       const consumer = await this.consumeData(target);
-      this.onSubscribeData.execute(consumer)
+      this.onSubscribeData.execute(consumer);
     });
 
     return this;
   };
 
-  sendTransport: Transport;
+  sendTransport!: Transport;
   setupProducerTransport = async () => {
     const transportInfo: any = await socketPromise(this.socket)(
       "createProducerTransport",
@@ -122,7 +123,7 @@ export class Client {
     return producer;
   }
 
-  recvTransport: Transport;
+  recvTransport!: Transport;
   async setupConsumerTransport() {
     const data: any = await socketPromise(this.socket)(
       "createConsumerTransport",
@@ -169,7 +170,7 @@ export class Client {
     });
   }
 
-  private loadDevice = async (routerRtpCapabilities) => {
+  private loadDevice = async (routerRtpCapabilities:RtpCapabilities) => {
     this.device = new mediasoup.Device();
     await this.device.load({ routerRtpCapabilities });
   };
@@ -187,7 +188,7 @@ export class Client {
       producerId,
       kind,
       rtpParameters,
-    });    
+    });
     return consumer.track;
   };
 
@@ -195,9 +196,9 @@ export class Client {
     const params: any = await socketPromise(this.socket)("consumeData", {
       producerId: target,
     });
-    console.warn({params})
+    console.warn({ params });
 
     const consumer = await this.recvTransport.consumeData(params);
-    return consumer
+    return consumer;
   };
 }

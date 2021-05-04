@@ -5173,10 +5173,10 @@ webidl-conversions@^6.1.0:
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-6.1.0.tgz#9111b4d7ea80acd40f5270d666621afa78b69514"
   integrity sha512-qBIvFLGiBpLjfwmYAaHPXsn+ho5xZnGvyGvsarywGNc8VyQJUMHJ8OBKGGrPER0okBeMDaan4mNBlgBROxuI8w==
 
-werift@^0.9.1:
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/werift/-/werift-0.9.1.tgz#3a212be34ca76f86f238fe2323bb2723046c9380"
-  integrity sha512-XgEM/Gsv+4BgdUcHNmAZpl0FAi27s3TIaavicNz/wD6WmXzibZc+Qax1aZCFBxFbBOCATq3v6+0uEjD8RLbIzg==
+werift@^0.9.6:
+  version "0.9.6"
+  resolved "https://registry.yarnpkg.com/werift/-/werift-0.9.6.tgz#ccffd335876dc201b14f48fcafbf630896f804c7"
+  integrity sha512-CEuZ+YjUQYzAJIrL4PS56GvpfyDbHFgtcQzMxAZLAa5x4rHYfVgkyb4FrZOYdyz2qOPc8nbl/htJPiZwrXvbew==
   dependencies:
     "@fidm/x509" "^1.2.1"
     "@peculiar/webcrypto" "^1.1.6"

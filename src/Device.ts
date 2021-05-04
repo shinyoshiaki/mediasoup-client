@@ -33,7 +33,7 @@ export type BuiltinHandlerName =
 	| 'Safari11'
 	| 'Edge11'
 	| 'ReactNative'
-	| "werift"
+	| 'werift'
 
 export type DeviceOptions =
 {
@@ -170,7 +170,7 @@ export function detectDevice(): BuiltinHandlerName | undefined
 	// Unknown device.
 	else
 	{
-		return "werift";
+		return 'werift';
 	}
 }
 
@@ -273,7 +273,7 @@ export class Device
 					break;
 				case 'werift':
 					this._handlerFactory = Werift.createFactory();
-					break
+					break;
 				default:
 					throw new TypeError(`unknown handlerName "${handlerName}"`);
 			}

@@ -20,7 +20,7 @@ import {
   HandlerSendOptions,
   HandlerSendResult,
 } from "./HandlerInterface";
-import { SctpCapabilities } from "../SctpParameters";
+import { SctpCapabilities, SctpStreamParameters } from "../SctpParameters";
 import { RtpCapabilities, RtpParameters } from "../RtpParameters";
 import { DtlsRole, IceParameters } from "../Transport";
 
@@ -44,6 +44,8 @@ export class Werift extends HandlerInterface {
     string,
     RTCRtpTransceiver
   > = new Map();
+  private _hasDataChannelMediaSection = false;
+  private _nextSendSctpStreamId = 0;
   private _transportReady = false;
 
   static createFactory() {
@@ -91,6 +93,7 @@ export class Werift extends HandlerInterface {
         },
       ],
     };
+
     return caps;
   }
 
@@ -173,7 +176,7 @@ export class Werift extends HandlerInterface {
   async restartIce(iceParameters: IceParameters): Promise<void> {}
 
   // todo impl
-  //@ts-expect-error
+  // @ts-expect-error
   async getTransportStats(): Promise<RTCStatsReport> {}
 
   // todo impl
@@ -182,7 +185,7 @@ export class Werift extends HandlerInterface {
     encodings,
     codecOptions,
     codec,
-  }: //@ts-expect-error
+  }: // @ts-expect-error
   HandlerSendOptions): Promise<HandlerSendResult> {}
 
   // todo impl
@@ -204,10 +207,9 @@ export class Werift extends HandlerInterface {
   async setRtpEncodingParameters(localId: string, params: any): Promise<void> {}
 
   // todo impl
-  //@ts-expect-error
+  // @ts-expect-error
   async getSenderStats(localId: string): Promise<RTCStatsReport> {}
 
-  // todo impl
   async sendDataChannel({
     ordered,
     maxPacketLifeTime,
@@ -215,8 +217,71 @@ export class Werift extends HandlerInterface {
     label,
     protocol,
     priority,
-  }: //@ts-expect-error
-  HandlerSendDataChannelOptions): Promise<HandlerSendDataChannelResult> {}
+  }: 
+  HandlerSendDataChannelOptions): Promise<HandlerSendDataChannelResult> {
+    this._assertSendDirection();
+
+    const options =
+		{
+			negotiated : true,
+			id         : this._nextSendSctpStreamId,
+			ordered,
+			maxPacketLifeTime,
+			maxRetransmits,
+			protocol,
+			priority
+		};
+
+    logger.debug('sendDataChannel() [options:%o]', options);
+
+		const dataChannel = this._pc.createDataChannel(label||"", options);
+
+    // Increase next id.
+		this._nextSendSctpStreamId =
+    ++this._nextSendSctpStreamId % SCTP_NUM_STREAMS.MIS;
+
+    		// If this is the first DataChannel we need to create the SDP answer with
+		// m=application section.
+		if (!this._hasDataChannelMediaSection)
+		{
+			const offer = await this._pc.createOffer();
+			const localSdpObject = sdpTransform.parse(offer.sdp);
+			const offerMediaObject = localSdpObject.media
+				.find((m: any) => m.type === 'application');
+
+			if (!this._transportReady)
+				await this._setupTransport({ localDtlsRole: 'server', localSdpObject });
+
+			logger.debug(
+				'sendDataChannel() | calling pc.setLocalDescription() [offer:%o]',
+				offer);
+
+			await this._pc.setLocalDescription(offer);
+
+			this._remoteSdp!.sendSctpAssociation({ offerMediaObject });
+
+			const answer = { type: 'answer', sdp: this._remoteSdp!.getSdp() } as const;
+
+			logger.debug(
+				'sendDataChannel() | calling pc.setRemoteDescription() [answer:%o]',
+				answer);
+
+			await this._pc.setRemoteDescription(answer);
+
+			this._hasDataChannelMediaSection = true;
+		}
+
+
+		const sctpStreamParameters: SctpStreamParameters =
+		{
+			streamId          : options.id,
+			ordered           : options.ordered,
+			maxPacketLifeTime : options.maxPacketLifeTime,
+			maxRetransmits    : options.maxRetransmits
+		};
+
+		return { dataChannel:dataChannel as any, sctpStreamParameters };
+  }
 
   async receive({
     trackId,
@@ -323,13 +388,67 @@ export class Werift extends HandlerInterface {
   // @ts-expect-error
   async getReceiverStats(localId: string): Promise<RTCStatsReport> {}
 
-  // todo impl
   async receiveDataChannel({
     sctpStreamParameters,
     label,
     protocol,
-  }: //@ts-expect-error
-  HandlerReceiveDataChannelOptions): Promise<HandlerReceiveDataChannelResult> {}
+  }: HandlerReceiveDataChannelOptions): Promise<HandlerReceiveDataChannelResult> {
+    this._assertRecvDirection();
+
+    const {
+      streamId,
+      ordered,
+      maxPacketLifeTime,
+      maxRetransmits,
+    }: SctpStreamParameters = sctpStreamParameters;
+
+    const options = {
+      negotiated: true,
+      id: streamId,
+      ordered,
+      maxPacketLifeTime,
+      maxRetransmits,
+      protocol,
+    };
+
+    logger.debug("receiveDataChannel() [options:%o]", options);
+
+    const dataChannel = this._pc.createDataChannel(label || "", options);
+
+    // If this is the first DataChannel we need to create the SDP offer with
+    // m=application section.
+    if (!this._hasDataChannelMediaSection) {
+      this._remoteSdp!.receiveSctpAssociation();
+
+      const offer = { type: "offer", sdp: this._remoteSdp!.getSdp() } as const;
+
+      logger.debug(
+        "receiveDataChannel() | calling pc.setRemoteDescription() [offer:%o]",
+        offer
+      );
+
+      await this._pc.setRemoteDescription(offer);
+
+      const answer = await this._pc.createAnswer();
+
+      if (!this._transportReady) {
+        const localSdpObject = sdpTransform.parse(answer.sdp);
+
+        await this._setupTransport({ localDtlsRole: "client", localSdpObject });
+      }
+
+      logger.debug(
+        "receiveDataChannel() | calling pc.setRemoteDescription() [answer:%o]",
+        answer
+      );
+
+      await this._pc.setLocalDescription(answer);
+
+      this._hasDataChannelMediaSection = true;
+    }
+
+    return { dataChannel } as any;
+  }
 
   private async _setupTransport({
     localDtlsRole,

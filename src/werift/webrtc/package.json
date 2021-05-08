@@ -1,0 +1,72 @@
+{
+  "name": "werift",
+  "version": "0.9.7",
+  "description": "WebRTC Implementation for TypeScript (Node.js)",
+  "keywords": [
+    "WebRTC",
+    "node.js"
+  ],
+  "homepage": "https://github.com/shinyoshiaki/werift-webrtc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shinyoshiaki/werift-webrtc.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "shinyoshiaki"
+  },
+  "main": "lib/webrtc/src/index.js",
+  "types": "lib/webrtc/src/index.d.ts",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "build": "rm -rf lib && yarn format && tsc -p ./tsconfig.production.json",
+    "depcheck": "depcheck --ignores='@typescript-eslint/*,eslint-*'",
+    "doc": "rm -rf doc && typedoc --out doc ./src/index.ts",
+    "format": "yarn unused && yarn lint && prettier --write src/**/*.ts",
+    "graph": "dependency-cruiser --exclude 'node_modules' --output-type dot src | dot -T svg > dependencygraph.svg",
+    "lint": "eslint src/**/*.ts --fix",
+    "test": "npm run type && jest --runInBand --forceExit --coverage",
+    "type": "tsc --noEmit --project ./tsconfig.json",
+    "unused": "organize-imports-cli src/**/*.ts"
+  },
+  "dependencies": {
+    "@fidm/x509": "^1.2.1",
+    "@peculiar/webcrypto": "^1.1.6",
+    "@peculiar/x509": "^1.2.2",
+    "aes-js": "^3.1.2",
+    "big-integer": "^1.6.48",
+    "binary-data": "^0.6.0",
+    "buffer-crc32": "^0.2.13",
+    "date-fns": "^2.21.3",
+    "debug": "^4.3.1",
+    "elliptic": "^6.5.3",
+    "int64-buffer": "^1.0.1",
+    "ip": "^1.1.5",
+    "jspack": "^0.0.4",
+    "lodash": "^4.17.20",
+    "nano-time": "^1.0.0",
+    "p-cancelable": "^2.1.1",
+    "rx.mini": "^1.1.0",
+    "turbo-crc32": "^1.0.1",
+    "tweetnacl": "^1.0.3",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/aes-js": "^3.1.1",
+    "@types/big-integer": "^0.0.31",
+    "@types/buffer-crc32": "^0.2.0",
+    "@types/debug": "^4.1.5",
+    "@types/elliptic": "^6.4.12",
+    "@types/ip": "^1.1.0",
+    "@types/lodash": "^4.14.166",
+    "@types/uuid": "^8.3.0",
+    "typedoc": "^0.20.36"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "readme": "README.md"
+}

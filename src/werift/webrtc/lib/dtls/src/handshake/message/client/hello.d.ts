@@ -1,0 +1,47 @@
+/// <reference types="node" />
+import { HandshakeType } from "../../const";
+import { FragmentedHandshake } from "../../../record/message/fragment";
+import { Extension } from "../../../typings/domain";
+export declare class ClientHello {
+    clientVersion: {
+        major: number;
+        minor: number;
+    };
+    random: {
+        gmt_unix_time: number;
+        random_bytes: Buffer;
+    };
+    sessionId: Buffer;
+    cookie: Buffer;
+    cipherSuites: number[];
+    compressionMethods: number[];
+    extensions: Extension[];
+    msgType: HandshakeType;
+    messageSeq: number;
+    static readonly spec: {
+        clientVersion: {
+            major: any;
+            minor: any;
+        };
+        random: {
+            gmt_unix_time: any;
+            random_bytes: any;
+        };
+        sessionId: any;
+        cookie: any;
+        cipherSuites: any;
+        compressionMethods: any;
+        extensions: any;
+    };
+    constructor(clientVersion: {
+        major: number;
+        minor: number;
+    }, random: {
+        gmt_unix_time: number;
+        random_bytes: Buffer;
+    }, sessionId: Buffer, cookie: Buffer, cipherSuites: number[], compressionMethods: number[], extensions: Extension[]);
+    static createEmpty(): ClientHello;
+    static deSerialize(buf: Buffer): ClientHello;
+    serialize(): Buffer;
+    toFragment(): FragmentedHandshake;
+}

@@ -123,6 +123,11 @@ export class SFU {
           kind,
           rtpParameters,
         });
+        producer.enableTraceEvent(["keyframe"]);
+        producer.on("trace", (trace) => {
+          console.log("trace", trace);
+        });
+
         this.producers.set(producer.id, producer);
         this.socketProducers.get(socket.id)?.push(producer.id);
         callback({ id: producer.id });
@@ -182,6 +187,7 @@ export class SFU {
   async runMediasoupWorker() {
     this.worker = await mediasoup.createWorker({
       logLevel: config.mediasoup.worker.logLevel as WorkerLogLevel,
+      logTags: config.mediasoup.worker.logTags as any,
       rtcMinPort: config.mediasoup.worker.rtcMinPort,
       rtcMaxPort: config.mediasoup.worker.rtcMaxPort,
     });

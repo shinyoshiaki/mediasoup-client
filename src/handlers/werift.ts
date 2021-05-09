@@ -2,9 +2,15 @@ import {
   RTCPeerConnection,
   RTCSessionDescription,
   RTCRtpTransceiver,
-} from "werift";
+  MediaStreamTrack,
+  useSdesMid,
+  useAbsSendTime,
+  RTCRtpCodecParameters,
+} from "../werift/webrtc/src";
+import * as utils from "../utils";
 import * as sdpTransform from "sdp-transform";
 import * as sdpCommonUtils from "./sdp/commonUtils";
+import * as sdpUnifiedPlanUtils from "./sdp/unifiedPlanUtils";
 import * as ortc from "../ortc";
 import { RemoteSdp } from "./sdp/RemoteSdp";
 import { Logger } from "../Logger";
@@ -21,7 +27,11 @@ import {
   HandlerSendResult,
 } from "./HandlerInterface";
 import { SctpCapabilities, SctpStreamParameters } from "../SctpParameters";
-import { RtpCapabilities, RtpParameters } from "../RtpParameters";
+import {
+  RtpCapabilities,
+  RtpEncodingParameters,
+  RtpParameters,
+} from "../RtpParameters";
 import { DtlsRole, IceParameters } from "../Transport";
 
 const logger = new Logger("werift");
@@ -79,17 +89,49 @@ export class Werift extends HandlerInterface {
           mimeType: "audio/opus",
           clockRate: 48000,
           channels: 2,
+          preferredPayloadType: 97,
         },
         {
           kind: "video",
-          mimeType: "video/VP8",
+          mimeType: "video/H264",
           clockRate: 90000,
+          preferredPayloadType: 98,
           rtcpFeedback: [
             { type: "ccm", parameter: "fir" },
             { type: "nack" },
             { type: "nack", parameter: "pli" },
             { type: "goog-remb" },
           ],
+        },
+      ],
+      headerExtensions: [
+        {
+          kind: "audio",
+          uri: "urn:ietf:params:rtp-hdrext:sdes:mid",
+          preferredId: 1,
+          preferredEncrypt: false,
+          direction: "sendrecv",
+        },
+        {
+          kind: "video",
+          uri: "urn:ietf:params:rtp-hdrext:sdes:mid",
+          preferredId: 1,
+          preferredEncrypt: false,
+          direction: "sendrecv",
+        },
+        {
+          kind: "audio",
+          uri: "http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time",
+          preferredId: 4,
+          preferredEncrypt: false,
+          direction: "sendrecv",
+        },
+        {
+          kind: "video",
+          uri: "http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time",
+          preferredId: 4,
+          preferredEncrypt: false,
+          direction: "sendrecv",
         },
       ],
     };
@@ -144,17 +186,35 @@ export class Werift extends HandlerInterface {
       ),
     };
 
-    this._pc = new (RTCPeerConnection as any)(
-      {
-        iceServers: iceServers || [],
-        iceTransportPolicy: iceTransportPolicy || "all",
-        bundlePolicy: "max-bundle",
-        rtcpMuxPolicy: "require",
-        sdpSemantics: "unified-plan",
-        ...additionalSettings,
+    this._pc = new RTCPeerConnection({
+      iceServers: iceServers || [],
+      iceTransportPolicy: iceTransportPolicy || "all",
+      bundlePolicy: "max-bundle",
+      rtcpMuxPolicy: "require",
+      sdpSemantics: "unified-plan",
+      headerExtensions: {
+        video: [
+          useSdesMid(),
+          useAbsSendTime(),          
+        ],
       },
-      proprietaryConstraints
-    );
+      codecs: {
+        video: [
+          new RTCRtpCodecParameters({
+            mimeType: "video/H264",
+            clockRate: 90000,
+            payloadType: 98,
+            rtcpFeedback: [
+              { type: "ccm", parameter: "fir" },
+              { type: "nack" },
+              { type: "nack", parameter: "pli" },
+              { type: "goog-remb" },              
+            ],
+          }),
+        ],
+      },
+      ...additionalSettings,
+    });
 
     // Handle RTCPeerConnection connection status.
     this._pc.connectionStateChange.subscribe((state) => {
@@ -179,14 +239,125 @@ export class Werift extends HandlerInterface {
   // @ts-expect-error
   async getTransportStats(): Promise<RTCStatsReport> {}
 
-  // todo impl
   async send({
     track,
     encodings,
     codecOptions,
     codec,
-  }: // @ts-expect-error
-  HandlerSendOptions): Promise<HandlerSendResult> {}
+  }: HandlerSendOptions): Promise<HandlerSendResult> {
+    this._assertSendDirection();
+
+    logger.debug("send() [kind:%s, track.id:%s]", track.kind, track.id);
+
+    if (encodings && encodings.length > 1) {
+      encodings.forEach((encoding: RtpEncodingParameters, idx: number) => {
+        encoding.rid = `r${idx}`;
+      });
+    }
+
+    const sendingRtpParameters = utils.clone(
+      this._sendingRtpParametersByKind![track.kind],
+      {}
+    );
+
+    // This may throw.
+    sendingRtpParameters.codecs = ortc.reduceCodecs(
+      sendingRtpParameters.codecs,
+      codec
+    );
+
+    const sendingRemoteRtpParameters = utils.clone(
+      this._sendingRemoteRtpParametersByKind![track.kind],
+      {}
+    );
+
+    // This may throw.
+    sendingRemoteRtpParameters.codecs = ortc.reduceCodecs(
+      sendingRemoteRtpParameters.codecs,
+      codec
+    );
+
+    const mediaSectionIdx = this._remoteSdp!.getNextMediaSectionIdx();
+    const transceiver = this._pc.addTransceiver(
+      (track as unknown) as MediaStreamTrack,
+      {
+        direction: "sendonly",
+      }
+    );
+    let offer = await this._pc.createOffer();
+    let localSdpObject = sdpTransform.parse(offer.sdp);
+    let offerMediaObject;
+
+    if (!this._transportReady) {
+      await this._setupTransport({ localDtlsRole: "server", localSdpObject });
+    }
+
+    console.log("send() | calling pc.setLocalDescription() [offer:%o]", offer);
+
+    await this._pc.setLocalDescription(offer);
+
+    // We can now get the transceiver.mid.
+    const localId = transceiver.mid;
+
+    // Set MID.
+    sendingRtpParameters.mid = localId;
+
+    localSdpObject = sdpTransform.parse(this._pc.localDescription!.sdp);
+    offerMediaObject = localSdpObject.media[mediaSectionIdx.idx];
+
+    // Set RTCP CNAME.
+    sendingRtpParameters.rtcp.cname = sdpCommonUtils.getCname({
+      offerMediaObject,
+    });
+
+    // Set RTP encodings by parsing the SDP offer if no encodings are given.
+    if (!encodings) {
+      sendingRtpParameters.encodings = sdpUnifiedPlanUtils.getRtpEncodings({
+        offerMediaObject,
+      });
+    }
+    // Set RTP encodings by parsing the SDP offer and complete them with given
+    // one if just a single encoding has been given.
+    else if (encodings.length === 1) {
+      let newEncodings = sdpUnifiedPlanUtils.getRtpEncodings({
+        offerMediaObject,
+      });
+
+      Object.assign(newEncodings[0], encodings[0]);
+
+      sendingRtpParameters.encodings = newEncodings;
+    }
+    // Otherwise if more than 1 encoding are given use them verbatim.
+    else {
+      sendingRtpParameters.encodings = encodings;
+    }
+
+    this._remoteSdp!.send({
+      offerMediaObject,
+      reuseMid: mediaSectionIdx.reuseMid,
+      offerRtpParameters: sendingRtpParameters,
+      answerRtpParameters: sendingRemoteRtpParameters,
+      codecOptions,
+      extmapAllowMixed: true,
+    });
+
+    const answer = { type: "answer", sdp: this._remoteSdp!.getSdp() } as const;
+
+    console.log(
+      "send() | calling pc.setRemoteDescription() [answer:%o]",
+      answer
+    );
+    await this._pc.setRemoteDescription(answer);
+
+    // Store in the map.
+    this._mapMidTransceiver.set(localId!, transceiver);
+
+    return {
+      localId: localId!,
+      rtpParameters: sendingRtpParameters,
+      rtpSender: transceiver.sender as any,
+    };
+  }
 
   // todo impl
   async stopSending(localId: string): Promise<void> {}
@@ -194,7 +365,7 @@ export class Werift extends HandlerInterface {
   // todo impl
   async replaceTrack(
     localId: string,
-    track: MediaStreamTrack | null
+    track: globalThis.MediaStreamTrack | null
   ): Promise<void> {}
 
   // todo impl
@@ -217,70 +388,71 @@ export class Werift extends HandlerInterface {
     label,
     protocol,
     priority,
-  }: 
-  HandlerSendDataChannelOptions): Promise<HandlerSendDataChannelResult> {
+  }: HandlerSendDataChannelOptions): Promise<HandlerSendDataChannelResult> {
     this._assertSendDirection();
 
-    const options =
-		{
-			negotiated : true,
-			id         : this._nextSendSctpStreamId,
-			ordered,
-			maxPacketLifeTime,
-			maxRetransmits,
-			protocol,
-			priority
-		};
+    const options = {
+      negotiated: true,
+      id: this._nextSendSctpStreamId,
+      ordered,
+      maxPacketLifeTime,
+      maxRetransmits,
+      protocol,
+      priority,
+    };
 
-    logger.debug('sendDataChannel() [options:%o]', options);
+    logger.debug("sendDataChannel() [options:%o]", options);
 
-		const dataChannel = this._pc.createDataChannel(label||"", options);
+    const dataChannel = this._pc.createDataChannel(label || "", options);
 
     // Increase next id.
-		this._nextSendSctpStreamId =
-    ++this._nextSendSctpStreamId % SCTP_NUM_STREAMS.MIS;
+    this._nextSendSctpStreamId =
+      ++this._nextSendSctpStreamId % SCTP_NUM_STREAMS.MIS;
 
-    		// If this is the first DataChannel we need to create the SDP answer with
-		// m=application section.
-		if (!this._hasDataChannelMediaSection)
-		{
-			const offer = await this._pc.createOffer();
-			const localSdpObject = sdpTransform.parse(offer.sdp);
-			const offerMediaObject = localSdpObject.media
-				.find((m: any) => m.type === 'application');
+    // If this is the first DataChannel we need to create the SDP answer with
+    // m=application section.
+    if (!this._hasDataChannelMediaSection) {
+      const offer = await this._pc.createOffer();
+      const localSdpObject = sdpTransform.parse(offer.sdp);
+      const offerMediaObject = localSdpObject.media.find(
+        (m: any) => m.type === "application"
+      );
 
-			if (!this._transportReady)
-				await this._setupTransport({ localDtlsRole: 'server', localSdpObject });
+      if (!this._transportReady)
+        await this._setupTransport({ localDtlsRole: "server", localSdpObject });
 
-			logger.debug(
-				'sendDataChannel() | calling pc.setLocalDescription() [offer:%o]',
-				offer);
+      logger.debug(
+        "sendDataChannel() | calling pc.setLocalDescription() [offer:%o]",
+        offer
+      );
 
-			await this._pc.setLocalDescription(offer);
+      await this._pc.setLocalDescription(offer);
 
-			this._remoteSdp!.sendSctpAssociation({ offerMediaObject });
+      this._remoteSdp!.sendSctpAssociation({ offerMediaObject });
 
-			const answer = { type: 'answer', sdp: this._remoteSdp!.getSdp() } as const;
+      const answer = {
+        type: "answer",
+        sdp: this._remoteSdp!.getSdp(),
+      } as const;
 
-			logger.debug(
-				'sendDataChannel() | calling pc.setRemoteDescription() [answer:%o]',
-				answer);
+      logger.debug(
+        "sendDataChannel() | calling pc.setRemoteDescription() [answer:%o]",
+        answer
+      );
 
-			await this._pc.setRemoteDescription(answer);
+      await this._pc.setRemoteDescription(answer);
 
-			this._hasDataChannelMediaSection = true;
-		}
+      this._hasDataChannelMediaSection = true;
+    }
 
+    const sctpStreamParameters: SctpStreamParameters = {
+      streamId: options.id,
+      ordered: options.ordered,
+      maxPacketLifeTime: options.maxPacketLifeTime,
+      maxRetransmits: options.maxRetransmits,
+    };
 
-		const sctpStreamParameters: SctpStreamParameters =
-		{
-			streamId          : options.id,
-			ordered           : options.ordered,
-			maxPacketLifeTime : options.maxPacketLifeTime,
-			maxRetransmits    : options.maxRetransmits
-		};
-
-		return { dataChannel:dataChannel as any, sctpStreamParameters };
+    return { dataChannel: dataChannel as any, sctpStreamParameters };
   }
 
   async receive({
@@ -348,7 +520,7 @@ export class Werift extends HandlerInterface {
     return {
       localId,
       // todo fix
-      track: (transceiver.receiver.tracks[0] as unknown) as MediaStreamTrack,
+      track: transceiver.receiver.tracks[0] as any,
       // todo fix
       rtpReceiver: (transceiver.receiver as unknown) as RTCRtpReceiver,
     };

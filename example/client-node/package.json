@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "DEBUG=werift* ts-node-dev src/main.ts"
+    "media": "DEBUG=werift* ts-node-dev src/media.ts"
   },
   "dependencies": {
     "rxjs": "^6.6.7",

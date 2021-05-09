@@ -5,12 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "client-node",
+      "name": "client-node-media",
       "type": "node",
       "request": "launch",
       "program": "${workspaceRoot}/node_modules/ts-node-dev/lib/bin.js",
       "protocol": "inspector",
-      "args": ["${workspaceRoot}/example/client-node/src/main.ts"],
+      "args": ["${workspaceRoot}/example/client-node/src/media.ts"],
       "env": { "DEBUG": "werift*" },
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"

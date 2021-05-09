@@ -9,8 +9,22 @@ const config = {
     worker: {
       rtcMinPort: 10000,
       rtcMaxPort: 10100,
-      logLevel: "warn",
-      logTags: ["info", "ice", "dtls", "rtp", "srtp", "rtcp"],
+      logLevel: "debug",
+      logTags: [
+        "info",
+        "ice",
+        "dtls",
+        "rtp",
+        "srtp",
+        "rtcp",
+        "rtx",
+        "bwe",
+        "score",
+        "simulcast",
+        "svc",
+        "sctp",
+        "message",
+      ],
     },
     router: {
       mediaCodecs: [
@@ -24,9 +38,10 @@ const config = {
           kind: "video" as MediaKind,
           mimeType: "video/VP8",
           clockRate: 90000,
-          parameters: {
-            "x-google-start-bitrate": 1000,
-          },
+        },{
+          kind: "video" as MediaKind,
+          mimeType: "video/H264",
+          clockRate: 90000,
         },
       ],
     },

@@ -6,7 +6,7 @@ import {
   useSdesMid,
   useAbsSendTime,
   RTCRtpCodecParameters,
-} from "../werift/webrtc/src";
+} from "werift";
 import * as utils from "../utils";
 import * as sdpTransform from "sdp-transform";
 import * as sdpCommonUtils from "./sdp/commonUtils";
@@ -93,7 +93,7 @@ export class Werift extends HandlerInterface {
         },
         {
           kind: "video",
-          mimeType: "video/H264",
+          mimeType: "video/VP8",
           clockRate: 90000,
           preferredPayloadType: 98,
           rtcpFeedback: [
@@ -201,7 +201,7 @@ export class Werift extends HandlerInterface {
       codecs: {
         video: [
           new RTCRtpCodecParameters({
-            mimeType: "video/H264",
+            mimeType: "video/VP8",
             clockRate: 90000,
             payloadType: 98,
             rtcpFeedback: [

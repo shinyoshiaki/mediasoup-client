@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../../src/index.ts"],"names":[],"mappings":";;;AAAA,yCAAwC;AAA/B,sGAAA,SAAS,OAAA;AAElB,6BAA+C;AAAtC,iGAAA,UAAU,OAAA","sourcesContent":["export { Candidate } from \"./candidate\";\n\nexport { Connection, IceOptions } from \"./ice\";\n\nexport { Address } from \"./types/model\";\n"]}

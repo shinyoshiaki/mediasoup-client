@@ -20,6 +20,7 @@ import { ReactNative } from './handlers/ReactNative';
 import { RtpCapabilities, MediaKind } from './RtpParameters';
 import { SctpCapabilities } from './SctpParameters';
 import { Werift } from './handlers/werift';
+import { RTCRtpCodecParameters, RTCRtpHeaderExtensionParameters } from 'werift';
 
 const logger = new Logger('Device');
 
@@ -199,7 +200,16 @@ export class Device
 	 *
 	 * @throws {UnsupportedError} if device is not supported.
 	 */
-	constructor({ handlerName, handlerFactory, Handler }: DeviceOptions = {})
+	constructor(weriftRtpCapabilities:{
+		codecs: Partial<{
+			audio: RTCRtpCodecParameters[];
+			video: RTCRtpCodecParameters[];
+		}>;
+		headerExtensions: Partial<{
+			audio: RTCRtpHeaderExtensionParameters[];
+			video: RTCRtpHeaderExtensionParameters[];
+		}>;},
+	{ handlerName, handlerFactory, Handler }: DeviceOptions = {})
 	{
 		logger.debug('constructor()');
 
@@ -272,7 +282,7 @@ export class Device
 					this._handlerFactory = ReactNative.createFactory();
 					break;
 				case 'werift':
-					this._handlerFactory = Werift.createFactory();
+					this._handlerFactory = Werift.createFactory(weriftRtpCapabilities) as any;
 					break;
 				default:
 					throw new TypeError(`unknown handlerName "${handlerName}"`);

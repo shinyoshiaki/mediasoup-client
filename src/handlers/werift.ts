@@ -1,11 +1,12 @@
+/* eslint-disable */
+
 import {
   RTCPeerConnection,
   RTCSessionDescription,
   RTCRtpTransceiver,
   MediaStreamTrack,
-  useSdesMid,
-  useAbsSendTime,
   RTCRtpCodecParameters,
+  RTCRtpHeaderExtensionParameters,
 } from "werift";
 import * as utils from "../utils";
 import * as sdpTransform from "sdp-transform";
@@ -29,7 +30,9 @@ import {
 import { SctpCapabilities, SctpStreamParameters } from "../SctpParameters";
 import {
   RtpCapabilities,
+  RtpCodecCapability,
   RtpEncodingParameters,
+  RtpHeaderExtension,
   RtpParameters,
 } from "../RtpParameters";
 import { DtlsRole, IceParameters } from "../Transport";
@@ -58,11 +61,31 @@ export class Werift extends HandlerInterface {
   private _nextSendSctpStreamId = 0;
   private _transportReady = false;
 
-  static createFactory() {
-    return () => new Werift();
+  static createFactory(nativeRtpCapabilities: {
+    codecs: Partial<{
+      audio: RTCRtpCodecParameters[];
+      video: RTCRtpCodecParameters[];
+    }>;
+    headerExtensions: Partial<{
+      audio: RTCRtpHeaderExtensionParameters[];
+      video: RTCRtpHeaderExtensionParameters[];
+    }>;
+  }) {
+    return () => new Werift(nativeRtpCapabilities);
   }
 
-  constructor() {
+  constructor(
+    public nativeRtpCapabilities: {
+      codecs: Partial<{
+        audio: RTCRtpCodecParameters[];
+        video: RTCRtpCodecParameters[];
+      }>;
+      headerExtensions: Partial<{
+        audio: RTCRtpHeaderExtensionParameters[];
+        video: RTCRtpHeaderExtensionParameters[];
+      }>;
+    }
+  ) {
     super();
   }
 
@@ -82,58 +105,52 @@ export class Werift extends HandlerInterface {
   }
 
   async getNativeRtpCapabilities(): Promise<RtpCapabilities> {
+    let preferredPayloadType = 96;
+    const codecs: RtpCodecCapability[] = [
+      ...(this.nativeRtpCapabilities.codecs.video || []).map(
+        ({ mimeType, clockRate, rtcpFeedback }) => {
+          const codec: RtpCodecCapability = {
+            kind: "video",
+            mimeType,
+            clockRate,
+            rtcpFeedback,
+            preferredPayloadType: preferredPayloadType++,
+          };
+          return codec;
+        }
+      ),
+      ...(this.nativeRtpCapabilities.codecs.audio || []).map(
+        ({ mimeType, clockRate, channels }) => {
+          const codec: RtpCodecCapability = {
+            kind: "audio",
+            mimeType,
+            clockRate,
+            channels,
+			preferredPayloadType: preferredPayloadType++,
+          };
+          return codec;
+        }
+      ),
+    ];
+    let preferredId = 1;
+    const headerExtensions: RtpHeaderExtension[] = [
+      ...(this.nativeRtpCapabilities.headerExtensions.audio || []).map(
+        ({ uri }) => {
+          const ext: RtpHeaderExtension = { uri, preferredId: preferredId++ };
+          return ext;
+        }
+      ),
+      ...(this.nativeRtpCapabilities.headerExtensions.video || []).map(
+        ({ uri }) => {
+          const ext: RtpHeaderExtension = { uri, preferredId: preferredId++ };
+          return ext;
+        }
+      ),
+    ];
+
     const caps: RtpCapabilities = {
-      codecs: [
-        {
-          kind: "audio",
-          mimeType: "audio/opus",
-          clockRate: 48000,
-          channels: 2,
-          preferredPayloadType: 97,
-        },
-        {
-          kind: "video",
-          mimeType: "video/VP8",
-          clockRate: 90000,
-          preferredPayloadType: 98,
-          rtcpFeedback: [
-            { type: "ccm", parameter: "fir" },
-            { type: "nack" },
-            { type: "nack", parameter: "pli" },
-            { type: "goog-remb" },
-          ],
-        },
-      ],
-      headerExtensions: [
-        {
-          kind: "audio",
-          uri: "urn:ietf:params:rtp-hdrext:sdes:mid",
-          preferredId: 1,
-          preferredEncrypt: false,
-          direction: "sendrecv",
-        },
-        {
-          kind: "video",
-          uri: "urn:ietf:params:rtp-hdrext:sdes:mid",
-          preferredId: 1,
-          preferredEncrypt: false,
-          direction: "sendrecv",
-        },
-        {
-          kind: "audio",
-          uri: "http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time",
-          preferredId: 4,
-          preferredEncrypt: false,
-          direction: "sendrecv",
-        },
-        {
-          kind: "video",
-          uri: "http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time",
-          preferredId: 4,
-          preferredEncrypt: false,
-          direction: "sendrecv",
-        },
-      ],
+      codecs,
+      headerExtensions,
     };
 
     return caps;
@@ -192,27 +209,7 @@ export class Werift extends HandlerInterface {
       bundlePolicy: "max-bundle",
       rtcpMuxPolicy: "require",
       sdpSemantics: "unified-plan",
-      headerExtensions: {
-        video: [
-          useSdesMid(),
-          useAbsSendTime(),          
-        ],
-      },
-      codecs: {
-        video: [
-          new RTCRtpCodecParameters({
-            mimeType: "video/VP8",
-            clockRate: 90000,
-            payloadType: 98,
-            rtcpFeedback: [
-              { type: "ccm", parameter: "fir" },
-              { type: "nack" },
-              { type: "nack", parameter: "pli" },
-              { type: "goog-remb" },              
-            ],
-          }),
-        ],
-      },
+      ...this.nativeRtpCapabilities,
       ...additionalSettings,
     });
 
@@ -284,7 +281,7 @@ export class Werift extends HandlerInterface {
         direction: "sendonly",
       }
     );
-    let offer = await this._pc.createOffer();
+    const offer = await this._pc.createOffer();
     let localSdpObject = sdpTransform.parse(offer.sdp);
     let offerMediaObject;
 
@@ -319,7 +316,7 @@ export class Werift extends HandlerInterface {
     // Set RTP encodings by parsing the SDP offer and complete them with given
     // one if just a single encoding has been given.
     else if (encodings.length === 1) {
-      let newEncodings = sdpUnifiedPlanUtils.getRtpEncodings({
+      const newEncodings = sdpUnifiedPlanUtils.getRtpEncodings({
         offerMediaObject,
       });
 

@@ -2,6 +2,11 @@ import * as mediasoup from "../../../src";
 import { DataConsumer, RtpCapabilities, Transport } from "../../../src/types";
 import { socketPromise } from "./socket.io-promise";
 import Event from "rx.mini";
+import {
+  RTCRtpCodecParameters,
+  useAbsSendTime,
+  useSdesMid,
+} from "../../../src";
 
 export class Client {
   device!: mediasoup.Device;
@@ -20,7 +25,7 @@ export class Client {
       console.log("Disconnected");
     });
 
-    this.socket.on("connect_error", (error:Error) => {
+    this.socket.on("connect_error", (error: Error) => {
       console.error("could not connect to %s%s (%s)", error.message);
     });
 
@@ -170,9 +175,30 @@ export class Client {
     });
   }
 
-  private loadDevice = async (routerRtpCapabilities:RtpCapabilities) => {
-    this.device = new mediasoup.Device();
-    await this.device.load({ routerRtpCapabilities });
+  private loadDevice = async (routerRtpCapabilities: RtpCapabilities) => {
+    this.device = new mediasoup.Device({
+      headerExtensions: {
+        video: [useSdesMid(), useAbsSendTime()],
+      },
+      codecs: {
+        video: [
+          new RTCRtpCodecParameters({
+            mimeType: "video/VP8",
+            clockRate: 90000,
+            payloadType: 98,
+            rtcpFeedback: [
+              { type: "ccm", parameter: "fir" },
+              { type: "nack" },
+              { type: "nack", parameter: "pli" },
+              { type: "goog-remb" },
+            ],
+          }),
+        ],
+      },
+    });
+    await this.device.load({
+      routerRtpCapabilities,
+    });
   };
 
   consume = async (target: string) => {

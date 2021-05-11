@@ -5,6 +5,10 @@ import Event from "rx.mini";
 import {
   RTCRtpCodecParameters,
   useAbsSendTime,
+  useFIR,
+  useNACK,
+  usePLI,
+  useREMB,
   useSdesMid,
 } from "../../../src";
 
@@ -186,12 +190,7 @@ export class Client {
             mimeType: "video/VP8",
             clockRate: 90000,
             payloadType: 98,
-            rtcpFeedback: [
-              { type: "ccm", parameter: "fir" },
-              { type: "nack" },
-              { type: "nack", parameter: "pli" },
-              { type: "goog-remb" },
-            ],
+            rtcpFeedback: [useFIR(), useNACK(), usePLI(), useREMB()],
           }),
         ],
       },

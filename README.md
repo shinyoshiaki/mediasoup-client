@@ -22,6 +22,7 @@ import {
   usePLI,
   useREMB,
   useSdesMid,
+  MediaStreamTrack,
 } from "msc-node";
 import mySignaling from "./my-signaling"; // Our own signaling stuff.
 

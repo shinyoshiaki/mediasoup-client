@@ -69,4 +69,3 @@ export declare type SctpStreamParameters = {
      */
     protocol?: string;
 };
-//# sourceMappingURL=SctpParameters.d.ts.map

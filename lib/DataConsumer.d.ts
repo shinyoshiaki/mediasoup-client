@@ -91,4 +91,3 @@ export declare class DataConsumer extends EnhancedEventEmitter {
     transportClosed(): void;
     private _handleDataChannel;
 }
-//# sourceMappingURL=DataConsumer.d.ts.map

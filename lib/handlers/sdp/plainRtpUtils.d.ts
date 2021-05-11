@@ -11,4 +11,3 @@ export declare function getRtpEncodings({ sdpObject, kind }: {
     sdpObject: any;
     kind: MediaKind;
 }): RtpEncodingParameters[];
-//# sourceMappingURL=plainRtpUtils.d.ts.map

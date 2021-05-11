@@ -17,4 +17,3 @@ export { Device, detectDevice };
  */
 export { parse as parseScalabilityMode } from './scalabilityModes';
 export * from 'werift';
-//# sourceMappingURL=index.d.ts.map

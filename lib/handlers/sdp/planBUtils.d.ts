@@ -11,4 +11,3 @@ export declare function addLegacySimulcast({ offerMediaObject, track, numStreams
     track: MediaStreamTrack;
     numStreams: number;
 }): void;
-//# sourceMappingURL=planBUtils.d.ts.map

@@ -207,4 +207,3 @@ export declare class Transport extends EnhancedEventEmitter {
     _handleDataConsumer(dataConsumer: DataConsumer): void;
 }
 export {};
-//# sourceMappingURL=Transport.d.ts.map

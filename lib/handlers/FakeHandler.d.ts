@@ -42,4 +42,3 @@ export declare class FakeHandler extends HandlerInterface {
     receiveDataChannel({ sctpStreamParameters, label, protocol }: HandlerReceiveDataChannelOptions): Promise<HandlerReceiveDataChannelResult>;
     private _setupTransport;
 }
-//# sourceMappingURL=FakeHandler.d.ts.map

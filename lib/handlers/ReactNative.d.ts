@@ -43,4 +43,3 @@ export declare class ReactNative extends HandlerInterface {
     private _assertSendDirection;
     private _assertRecvDirection;
 }
-//# sourceMappingURL=ReactNative.d.ts.map

@@ -26,7 +26,7 @@ import {
 } from "msc-node";
 import mySignaling from "./my-signaling"; // Our own signaling stuff.
 
-// Create a device with Producer RtpCapabilities
+// Create a device with RtpCapabilities
 const device = new Device({
   headerExtensions: {
     video: [useSdesMid(), useAbsSendTime()],

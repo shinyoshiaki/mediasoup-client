@@ -1,6 +1,6 @@
 # mediasoup-client-node [WIP]
 
-Node.js client side library for building [mediasoup][mediasoup-website] based applications.
+Node.js client side (not browser,just node.js) library for building [mediasoup][mediasoup-website] based applications.
 
 ## Website and Documentation
 

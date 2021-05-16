@@ -232,8 +232,8 @@ export class Transport extends EnhancedEventEmitter
 			});
 
 		this._appData = appData;
-		//@ts-expect-error
-		this.pc = this._handler._pc
+		// @ts-expect-error
+		this.pc = this._handler._pc;
 		this._handleHandler();
 	}
 

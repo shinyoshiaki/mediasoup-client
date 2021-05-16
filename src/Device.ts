@@ -58,6 +58,18 @@ interface InternalTransportOptions extends TransportOptions
 	direction: 'send' | 'recv';
 }
 
+export interface WeriftRtpCapabilities
+{
+	codecs: Partial<{
+		audio: RTCRtpCodecParameters[];
+		video: RTCRtpCodecParameters[];
+	}>;
+	headerExtensions: Partial<{
+		audio: RTCRtpHeaderExtensionParameters[];
+		video: RTCRtpHeaderExtensionParameters[];
+	}>;
+}
+
 export function detectDevice(): BuiltinHandlerName | undefined
 {
 	// React-Native.
@@ -200,16 +212,8 @@ export class Device
 	 *
 	 * @throws {UnsupportedError} if device is not supported.
 	 */
-	constructor(weriftRtpCapabilities:{
-		codecs: Partial<{
-			audio: RTCRtpCodecParameters[];
-			video: RTCRtpCodecParameters[];
-		}>;
-		headerExtensions: Partial<{
-			audio: RTCRtpHeaderExtensionParameters[];
-			video: RTCRtpHeaderExtensionParameters[];
-		}>;},
-	{ handlerName, handlerFactory, Handler }: DeviceOptions = {})
+	constructor(weriftRtpCapabilities:WeriftRtpCapabilities, 
+		{ handlerName, handlerFactory, Handler }: DeviceOptions = {})
 	{
 		logger.debug('constructor()');
 

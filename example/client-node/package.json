@@ -4,7 +4,8 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "media": "DEBUG=werift* ts-node-dev src/media.ts"
+    "media": "DEBUG=werift* ts-node-dev src/media.ts",
+    "test": "jest --forceExit"
   },
   "jest": {
     "preset": "ts-jest",

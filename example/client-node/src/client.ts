@@ -1,5 +1,11 @@
 import * as mediasoup from "../../../src";
-import { Consumer, DataConsumer, RtpCapabilities, Transport } from "../../../src/types";
+import {
+  Consumer,
+  DataConsumer,
+  RtpCapabilities,
+  Transport,
+  WeriftRtpCapabilities,
+} from "../../../src/types";
 import { socketPromise } from "./socket.io-promise";
 import Event from "rx.mini";
 import {
@@ -17,8 +23,24 @@ export class Client {
   onProduceMedia = new Event<[string]>();
   onProduceData = new Event<[string]>();
 
-  //@ts-ignore
-  constructor(private socket: SocketIOClient.Socket) {}
+  constructor(
+    private socket: SocketIOClient.Socket,
+    private weriftCaps: WeriftRtpCapabilities = {
+      headerExtensions: {
+        video: [useSdesMid(), useAbsSendTime()],
+      },
+      codecs: {
+        video: [
+          new RTCRtpCodecParameters({
+            mimeType: "video/VP8",
+            clockRate: 90000,
+            payloadType: 98,
+            rtcpFeedback: [useFIR(), useNACK(), usePLI(), useREMB()],
+          }),
+        ],
+      },
+    }
+  ) {}
 
   init = async () => {
     const data = await socketPromise(this.socket)("getRouterRtpCapabilities");
@@ -176,21 +198,7 @@ export class Client {
   }
 
   private loadDevice = async (routerRtpCapabilities: RtpCapabilities) => {
-    this.device = new mediasoup.Device({
-      headerExtensions: {
-        video: [useSdesMid(), useAbsSendTime()],
-      },
-      codecs: {
-        video: [
-          new RTCRtpCodecParameters({
-            mimeType: "video/VP8",
-            clockRate: 90000,
-            payloadType: 98,
-            rtcpFeedback: [useFIR(), useNACK(), usePLI(), useREMB()],
-          }),
-        ],
-      },
-    });
+    this.device = new mediasoup.Device(this.weriftCaps);
     await this.device.load({
       routerRtpCapabilities,
     });

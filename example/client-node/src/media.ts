@@ -19,12 +19,14 @@ socket.on("connect", async () => {
   await new Promise((r) => socket.on("join", r));
   console.log("joined");
 
-  const client = await new Client(socket).connect();
+  const client = await new Client(socket).init();
   await client.setupConsumerTransport();
   await client.setupProducerTransport();
 
-  client.onSubscribeMedia.subscribe((track) => {
-    ((track as unknown) as MediaStreamTrack).onReceiveRtp.subscribe((rtp) => {
+  client.onProduceMedia.subscribe(async (target) => {
+    const consumer = await client.consume(target);
+    const track = consumer.track as unknown as MediaStreamTrack;
+    track.onReceiveRtp.subscribe((rtp) => {
       udp.send(rtp.serialize(), 4002);
     });
   });

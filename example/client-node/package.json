@@ -1,20 +1,30 @@
 {
   "name": "client-node",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
+  "main": "index.js",
   "scripts": {
     "media": "DEBUG=werift* ts-node-dev src/media.ts"
   },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/*.test.ts"
+    ]
+  },
   "dependencies": {
-    "rxjs": "^6.6.7",
+    "rx.mini": "^1.1.0",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.23",
     "@types/node": "^14.14.41",
     "@types/socket.io": "^2.1.4",
     "@types/socket.io-client": "^1.4.36",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.6",
     "ts-node": "^9.1.1",
     "ts-node-dev": "^1.1.6",
     "tslib": "^2.2.0",

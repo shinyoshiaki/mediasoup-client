@@ -10,6 +10,7 @@ import { Consumer, ConsumerOptions } from './Consumer';
 import { DataProducer, DataProducerOptions } from './DataProducer';
 import { DataConsumer, DataConsumerOptions } from './DataConsumer';
 import { SctpParameters } from './SctpParameters';
+import { RTCPeerConnection } from 'werift';
 
 interface InternalTransportOptions extends TransportOptions
 {
@@ -134,6 +135,7 @@ const logger = new Logger('Transport');
 
 export class Transport extends EnhancedEventEmitter
 {
+	pc:RTCPeerConnection;
 	// Id.
 	private readonly _id: string;
 	// Closed flag.
@@ -230,7 +232,8 @@ export class Transport extends EnhancedEventEmitter
 			});
 
 		this._appData = appData;
-
+		//@ts-expect-error
+		this.pc = this._handler._pc
 		this._handleHandler();
 	}
 

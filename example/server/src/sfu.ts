@@ -17,7 +17,7 @@ import {
   DtlsParameters,
 } from "mediasoup/lib/types";
 import config from "./config";
-import { Subject } from "rxjs";
+import Event from "rx.mini";
 
 export class SFU {
   worker?: Worker;
@@ -25,27 +25,18 @@ export class SFU {
   socketProducers = new Map<string, string[]>();
   producers = new Map<string, Producer>();
   dataProducers = new Map<string, DataProducer>();
+  socketConsumers = new Map<string, string[]>();
   consumers = new Map<string, Consumer>();
   dataConsumers = new Map<string, DataConsumer>();
   producerTransports = new Map<string, WebRtcTransport>();
   consumerTransports = new Map<string, WebRtcTransport>();
   mediasoupRouter?: Router;
-  onProduce = new Subject<string>();
-  onProduceData = new Subject<string>();
+  onProduce = new Event<[string]>();
+  onProduceData = new Event<[string]>();
 
   listen(socket: Socket) {
     this.socketProducers.set(socket.id, []);
-    socket.on("disconnect", () => {
-      this.socketProducers.get(socket.id)?.forEach((id) => {
-        this.producers.delete(id);
-        this.dataProducers.delete(id);
-      });
-      console.log("client disconnected");
-    });
-
-    socket.on("connect_error", (err) => {
-      console.error("client connection error", err);
-    });
+    this.socketConsumers.set(socket.id, []);
 
     socket.on("getRouterRtpCapabilities", (_, callback) => {
       callback(this.mediasoupRouter?.rtpCapabilities);
@@ -132,7 +123,7 @@ export class SFU {
         this.socketProducers.get(socket.id)?.push(producer.id);
         callback({ id: producer.id });
 
-        this.onProduce.next(producer.id);
+        this.onProduce.execute(producer.id);
       }
     );
 
@@ -144,7 +135,7 @@ export class SFU {
       this.socketProducers.get(socket.id)?.push(producer.id);
       callback({ id: producer.id });
 
-      this.onProduceData.next(producer.id);
+      this.onProduceData.execute(producer.id);
     });
 
     socket.on(
@@ -167,6 +158,14 @@ export class SFU {
     );
 
     socket.on(
+      "unConsume",
+      async ({ consumerId }: { consumerId: string }, callback) => {
+        this.unConsume(consumerId);
+        callback();
+      }
+    );
+
+    socket.on(
       "consumeData",
       async ({ producerId }: { producerId: string }, callback) => {
         callback(
@@ -177,11 +176,29 @@ export class SFU {
         );
       }
     );
+
+    socket.on(
+      "unConsumeData",
+      async ({ consumerId }: { consumerId: string }, callback) => {
+        this.unConsumeData(consumerId);
+        callback();
+      }
+    );
   }
 
   disconnect(socketId: string) {
     this.producerTransports.delete(socketId);
     this.consumerTransports.delete(socketId);
+    this.socketProducers.get(socketId)?.forEach((id) => {
+      this.producers.delete(id);
+      this.dataProducers.delete(id);
+    });
+    this.socketProducers.delete(socketId);
+    this.socketConsumers.get(socketId)?.forEach((id) => {
+      this.consumers.delete(id);
+      this.dataConsumers.delete(id);
+    });
+    console.log("client disconnected");
   }
 
   async runMediasoupWorker() {
@@ -205,11 +222,8 @@ export class SFU {
   }
 
   private async createWebRtcTransport() {
-    const {
-      maxIncomingBitrate,
-      initialAvailableOutgoingBitrate,
-      listenIps,
-    } = config.mediasoup.webRtcTransport;
+    const { maxIncomingBitrate, initialAvailableOutgoingBitrate, listenIps } =
+      config.mediasoup.webRtcTransport;
 
     const transport = await this.mediasoupRouter?.createWebRtcTransport({
       listenIps: listenIps as any,
@@ -255,7 +269,10 @@ export class SFU {
         producerId: producer.id,
         rtpCapabilities,
       })!;
+
+      this.socketConsumers.get(socketId)?.push(consumer.id);
       this.consumers.set(consumer.id, consumer);
+
       return {
         producerId: producer.id,
         id: consumer.id,
@@ -268,6 +285,12 @@ export class SFU {
     }
   }
 
+  private unConsume(consumerId: string) {
+    const consumer = this.consumers.get(consumerId);
+    consumer?.close();
+    this.consumers.delete(consumerId);
+  }
+
   private async createDataConsumer(socketId: string, producer: DataProducer) {
     try {
       const consumer = await this.consumerTransports
@@ -276,7 +299,9 @@ export class SFU {
           dataProducerId: producer.id,
         })!;
 
+      this.socketConsumers.get(socketId)?.push(consumer.id);
       this.dataConsumers.set(consumer.id, consumer);
+
       return {
         dataProducerId: producer.id,
         id: consumer.id,
@@ -286,5 +311,11 @@ export class SFU {
       console.error("consume failed", error);
       return;
     }
+  }
+
+  private unConsumeData(consumerId: string) {
+    const consumer = this.dataConsumers.get(consumerId);
+    consumer?.close();
+    this.dataConsumers.delete(consumerId);
   }
 }

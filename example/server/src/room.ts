@@ -15,31 +15,27 @@ export class Room {
     await this.sfu.runMediasoupWorker();
     this.sfu.onProduce.subscribe((producerId) => {
       console.log("produce", producerId);
-      this.guestsSockets        
-        .forEach((socket) => {
-          console.log("emit produce", producerId);
-          socket.emit("produce", producerId);
-        });
+      this.guestsSockets.forEach((socket) => {
+        socket.emit("produce", producerId);
+      });
     });
     this.sfu.onProduceData.subscribe((producerId) => {
       console.log("produce", producerId);
-      this.guestsSockets        
-        .forEach((socket) => {
-          console.log("emit produceData", producerId);
-          socket.emit("produceData", producerId);
-        });
+      this.guestsSockets.forEach((socket) => {
+        socket.emit("produceData", producerId);
+      });
     });
   }
 
-  addGuest(guestSocket: Socket) {
-    this.guests[guestSocket.id] = guestSocket;
+  addGuest(socket: Socket) {
+    this.guests[socket.id] = socket;
 
-    guestSocket.on("disconnect", () => {
-      console.log("on disconnect")
-      delete this.guests[guestSocket.id];
-      this.sfu.disconnect(guestSocket.id)
+    socket.on("disconnect", () => {
+      console.log("on disconnect");
+      delete this.guests[socket.id];
+      this.sfu.disconnect(socket.id);
     });
 
-    this.sfu.listen(guestSocket);
+    this.sfu.listen(socket);
   }
 }

@@ -1,5 +1,5 @@
 import * as mediasoup from "../../../src";
-import { DataConsumer, RtpCapabilities, Transport } from "../../../src/types";
+import { Consumer, DataConsumer, RtpCapabilities, Transport } from "../../../src/types";
 import { socketPromise } from "./socket.io-promise";
 import Event from "rx.mini";
 import {
@@ -14,15 +14,14 @@ import {
 
 export class Client {
   device!: mediasoup.Device;
-  onSubscribeMedia = new Event<[MediaStreamTrack]>();
-  onSubscribeData = new Event<[DataConsumer]>();
+  onProduceMedia = new Event<[string]>();
+  onProduceData = new Event<[string]>();
 
   //@ts-ignore
   constructor(private socket: SocketIOClient.Socket) {}
 
-  connect = async () => {
+  init = async () => {
     const data = await socketPromise(this.socket)("getRouterRtpCapabilities");
-    console.log(data);
     await this.loadDevice(data);
 
     this.socket.on("disconnect", () => {
@@ -38,13 +37,11 @@ export class Client {
     });
 
     this.socket.on("produce", async (target: string) => {
-      const track = await this.consume(target);
-      this.onSubscribeMedia.execute(track);
+      this.onProduceMedia.execute(target);
     });
 
     this.socket.on("produceData", async (target: string) => {
-      const consumer = await this.consumeData(target);
-      this.onSubscribeData.execute(consumer);
+      this.onProduceData.execute(target);
     });
 
     return this;
@@ -107,7 +104,6 @@ export class Client {
     });
 
     this.sendTransport.on("connectionstatechange", (state) => {
-      console.log({ state });
       switch (state) {
         case "connecting":
           break;
@@ -124,7 +120,8 @@ export class Client {
 
   async publishMedia(track: MediaStreamTrack) {
     const params = { track };
-    await this.sendTransport.produce(params);
+    const producer = await this.sendTransport.produce(params);
+    return producer;
   }
 
   async publishData() {
@@ -164,7 +161,6 @@ export class Client {
     );
 
     this.recvTransport.on("connectionstatechange", async (state) => {
-      console.log({ state });
       switch (state) {
         case "connecting":
           break;
@@ -214,7 +210,14 @@ export class Client {
       kind,
       rtpParameters,
     });
-    return consumer.track;
+    return consumer;
+  };
+
+  unConsume = async (consumer: Consumer) => {
+    await socketPromise(this.socket)("unConsume", {
+      consumerId: consumer.id,
+    });
+    consumer.close();
   };
 
   consumeData = async (target: string) => {
@@ -225,5 +228,12 @@ export class Client {
 
     const consumer = await this.recvTransport.consumeData(params);
     return consumer;
+  };
+
+  unConsumeData = async (consumer: DataConsumer) => {
+    await socketPromise(this.socket)("unConsumeData", {
+      consumerId: consumer.id,
+    });
+    consumer.close();
   };
 }

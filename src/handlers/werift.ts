@@ -51,12 +51,10 @@ export class Werift extends HandlerInterface {
   // Generic sending RTP parameters for audio and video suitable for the SDP
   // remote answer.
   private _sendingRemoteRtpParametersByKind?: { [key: string]: RtpParameters };
-  private _pc!: RTCPeerConnection;
+  _pc!: RTCPeerConnection;
   // Map of RTCTransceivers indexed by MID.
-  private readonly _mapMidTransceiver: Map<
-    string,
-    RTCRtpTransceiver
-  > = new Map();
+  private readonly _mapMidTransceiver: Map<string, RTCRtpTransceiver> =
+    new Map();
   private _hasDataChannelMediaSection = false;
   private _nextSendSctpStreamId = 0;
   private _transportReady = false;
@@ -126,7 +124,7 @@ export class Werift extends HandlerInterface {
             mimeType,
             clockRate,
             channels,
-			preferredPayloadType: preferredPayloadType++,
+            preferredPayloadType: preferredPayloadType++,
           };
           return codec;
         }
@@ -276,7 +274,7 @@ export class Werift extends HandlerInterface {
 
     const mediaSectionIdx = this._remoteSdp!.getNextMediaSectionIdx();
     const transceiver = this._pc.addTransceiver(
-      (track as unknown) as MediaStreamTrack,
+      track as unknown as MediaStreamTrack,
       {
         direction: "sendonly",
       }
@@ -289,7 +287,7 @@ export class Werift extends HandlerInterface {
       await this._setupTransport({ localDtlsRole: "server", localSdpObject });
     }
 
-    console.log("send() | calling pc.setLocalDescription() [offer:%o]", offer);
+    logger.debug("send() | calling pc.setLocalDescription() [offer:%o]", offer);
 
     await this._pc.setLocalDescription(offer);
 
@@ -340,7 +338,7 @@ export class Werift extends HandlerInterface {
 
     const answer = { type: "answer", sdp: this._remoteSdp!.getSdp() } as const;
 
-    console.log(
+    logger.debug(
       "send() | calling pc.setRemoteDescription() [answer:%o]",
       answer
     );
@@ -493,7 +491,10 @@ export class Werift extends HandlerInterface {
       answerMediaObject,
     });
 
-    answer = { type: "answer", sdp: sdpTransform.write(localSdpObject) };
+    answer = new RTCSessionDescription(
+      sdpTransform.write(localSdpObject),
+      "answer"
+    );
 
     if (!this._transportReady)
       await this._setupTransport({ localDtlsRole: "client", localSdpObject });
@@ -519,7 +520,7 @@ export class Werift extends HandlerInterface {
       // todo fix
       track: transceiver.receiver.tracks[0] as any,
       // todo fix
-      rtpReceiver: (transceiver.receiver as unknown) as RTCRtpReceiver,
+      rtpReceiver: transceiver.receiver as unknown as RTCRtpReceiver,
     };
   }
 

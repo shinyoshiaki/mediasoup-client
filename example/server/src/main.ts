@@ -11,12 +11,12 @@ console.log("start");
   srv.listen(20000);
   await room.init();
   io.on("connection", (socket) => {
-    console.log("on connection")
-    socket.on("join",()=>{
-      console.log("on join")
+    console.log("on connection");
+    socket.on("join", (_, cb) => {
+      console.log("on join");
       room.addGuest(socket);
-      socket.emit("join")
-    })
-    
+      socket.emit("join");
+      cb();
+    });
   });
 })();

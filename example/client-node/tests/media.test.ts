@@ -3,7 +3,11 @@ import { createSocket } from "dgram";
 import { Client } from "../src/client";
 import io from "socket.io-client";
 import { socketPromise } from "../src/socket.io-promise";
-import { MediaStreamTrack } from "../../../src";
+import {
+  MediaStreamTrack,
+  RTCRtpCodecParameters,
+  RtpBuilder,
+} from "../../../src";
 
 describe("media", () => {
   test("produce consume", async (done) => {
@@ -71,5 +75,43 @@ describe("media", () => {
     const track = new MediaStreamTrack({ kind: "video" });
     await client.publishMedia(track as any);
     expect(client.sendTransport.pc.transceivers.length).toBe(1);
+  });
+
+  test("produce(audio) consume", async (done) => {
+    const socket = io.connect("http://127.0.0.1:20000");
+
+    await socketPromise(socket)("join");
+
+    const client = await new Client(socket, {
+      codecs: {
+        audio: [
+          new RTCRtpCodecParameters({
+            mimeType: "audio/opus",
+            clockRate: 48000,
+            channels: 2,
+          }),
+        ],
+      },
+      headerExtensions: {},
+    }).init();
+    await client.setupConsumerTransport();
+    await client.setupProducerTransport();
+
+    client.onProduceMedia.subscribe(async (target) => {
+      const consumer = await client.consume(target);
+      const track = consumer.track as unknown as MediaStreamTrack;
+      track.onReceiveRtp.subscribe((rtp) => {
+        expect(rtp.payload.toString()).toBe("audio");
+        done();
+      });
+    });
+
+    const track = new MediaStreamTrack({ kind: "audio" });
+    await client.publishMedia(track as any);
+    const audioRtp = new RtpBuilder();
+    setInterval(() => {
+      const rtp = audioRtp.create(Buffer.from("audio"));
+      track.writeRtp(rtp);
+    }, 1000 / 30);
   });
 });

@@ -1,14 +1,5 @@
 import * as mediasoup from "../../../src";
 import {
-  Consumer,
-  DataConsumer,
-  RtpCapabilities,
-  Transport,
-  WeriftRtpCapabilities,
-} from "../../../src/types";
-import { socketPromise } from "./socket.io-promise";
-import Event from "rx.mini";
-import {
   RTCRtpCodecParameters,
   useAbsSendTime,
   useFIR,
@@ -17,6 +8,15 @@ import {
   useREMB,
   useSdesMid,
 } from "../../../src";
+import {
+  Consumer,
+  DataConsumer,
+  RtpCapabilities,
+  Transport,
+  WeriftRtpCapabilities,
+} from "../../../src/types";
+import { socketPromise } from "./socket.io-promise";
+import Event from "rx.mini";
 
 export class Client {
   device!: mediasoup.Device;

@@ -1,5 +1,6 @@
 import { EnhancedEventEmitter } from './EnhancedEventEmitter';
 import { RtpParameters } from './RtpParameters';
+import { MediaStreamTrack } from 'werift';
 export declare type ConsumerOptions = {
     id?: string;
     producerId?: string;

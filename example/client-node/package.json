@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "media": "DEBUG=werift* ts-node-dev src/media.ts",
-    "test": "jest --forceExit"
+    "test": "jest --forceExit --runInBand"
   },
   "jest": {
     "preset": "ts-jest",

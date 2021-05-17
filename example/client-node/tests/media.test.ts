@@ -8,6 +8,7 @@ import {
   RTCRtpCodecParameters,
   RtpBuilder,
 } from "../../../src";
+import { Counter } from "./util";
 
 describe("media", () => {
   test("produce consume", async (done) => {
@@ -29,7 +30,7 @@ describe("media", () => {
       const track = (await client.consume(target)).track;
       expect(client.recvTransport.pc.transceivers.length).toBe(2); // mid 0 & mid probator
       (track as unknown as MediaStreamTrack).onReceiveRtp.subscribe(
-        async (rtp) => {
+        async () => {
           try {
             process.kill(child.pid + 1);
           } catch (error) {}
@@ -69,6 +70,8 @@ describe("media", () => {
       expect(
         client.recvTransport.pc.transceivers.map((t) => t.currentDirection)
       ).toEqual(["inactive", "recvonly"]);
+      socket.close();
+      await new Promise((r) => setTimeout(r, 500));
       done();
     });
 
@@ -99,19 +102,86 @@ describe("media", () => {
 
     client.onProduceMedia.subscribe(async (target) => {
       const consumer = await client.consume(target);
+      expect(client.recvTransport.pc.transceivers.length).toBe(1);
       const track = consumer.track as unknown as MediaStreamTrack;
-      track.onReceiveRtp.subscribe((rtp) => {
+      track.onReceiveRtp.subscribe(async (rtp) => {
         expect(rtp.payload.toString()).toBe("audio");
+        socket.close();
+        await new Promise((r) => setTimeout(r, 500));
         done();
       });
     });
 
     const track = new MediaStreamTrack({ kind: "audio" });
     await client.publishMedia(track as any);
+    expect(client.sendTransport.pc.transceivers.length).toBe(1);
     const audioRtp = new RtpBuilder();
     setInterval(() => {
       const rtp = audioRtp.create(Buffer.from("audio"));
       track.writeRtp(rtp);
     }, 1000 / 30);
+  });
+
+  test("produce(audio) produce(audio) consume consume", async (done) => {
+    await new Promise((r) => setTimeout(r, 500));
+
+    const socket = io.connect("http://127.0.0.1:20000");
+
+    await socketPromise(socket)("join");
+
+    const client = await new Client(socket, {
+      codecs: {
+        audio: [
+          new RTCRtpCodecParameters({
+            mimeType: "audio/opus",
+            clockRate: 48000,
+            channels: 2,
+          }),
+        ],
+      },
+      headerExtensions: {},
+    }).init();
+    await client.setupConsumerTransport();
+    await client.setupProducerTransport();
+
+    const counter = new Counter(3, async () => {
+      expect(client.recvTransport.pc.transceivers.length).toBe(2);
+      socket.close();
+      await new Promise((r) => setTimeout(r, 500));
+      done();
+    });
+
+    let index = 1;
+    client.onProduceMedia.subscribe(async (target) => {
+      const toBe = index++;
+      const consumer = await client.consume(target);
+      const track = consumer.track as unknown as MediaStreamTrack;
+      track.onReceiveRtp.once((rtp) => {
+        expect(rtp.payload.toString()).toBe(toBe.toString());
+        counter.done();
+      });
+    });
+
+    {
+      const track = new MediaStreamTrack({ kind: "audio" });
+      await client.publishMedia(track as any);
+      const audioRtp = new RtpBuilder();
+      setInterval(() => {
+        const rtp = audioRtp.create(Buffer.from("1"));
+        track.writeRtp(rtp);
+      }, 1000 / 30);
+    }
+    {
+      const track = new MediaStreamTrack({ kind: "audio" });
+      await client.publishMedia(track as any);
+      const audioRtp = new RtpBuilder();
+      setInterval(() => {
+        const rtp = audioRtp.create(Buffer.from("2"));
+        track.writeRtp(rtp);
+      }, 1000 / 30);
+    }
+
+    expect(client.sendTransport.pc.transceivers.length).toBe(2);
+    counter.done();
   });
 });

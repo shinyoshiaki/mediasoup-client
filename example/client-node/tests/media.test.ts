@@ -12,7 +12,7 @@ import {
   usePLI,
   useREMB,
 } from "../../../src";
-import { Counter } from "./util";
+import { Counter, waitFor } from "./fixture";
 
 describe("media", () => {
   test("produce consume", async (done) => {
@@ -39,7 +39,7 @@ describe("media", () => {
             process.kill(child.pid + 1);
           } catch (error) {}
           socket.close();
-          await new Promise((r) => setTimeout(r, 500));
+          await new Promise((r) => setTimeout(r, waitFor));
           done();
         }
       );
@@ -74,7 +74,7 @@ describe("media", () => {
         client.recvTransport.pc.transceivers.map((t) => t.currentDirection)
       ).toEqual(["inactive", "recvonly"]);
       socket.close();
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, waitFor));
       done();
     });
 
@@ -110,7 +110,7 @@ describe("media", () => {
       track.onReceiveRtp.subscribe(async (rtp) => {
         expect(rtp.payload.toString()).toBe("audio");
         socket.close();
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, waitFor));
         done();
       });
     });
@@ -148,7 +148,7 @@ describe("media", () => {
     const counter = new Counter(3, async () => {
       expect(client.recvTransport.pc.transceivers.length).toBe(2);
       socket.close();
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, waitFor));
       done();
     });
 
@@ -225,7 +225,7 @@ describe("media", () => {
         udp.close();
         process.kill(child.pid + 1);
       } catch (error) {}
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, waitFor));
       done();
     });
 

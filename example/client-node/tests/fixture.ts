@@ -6,3 +6,5 @@ export class Counter {
     if (++this.index === this.target) this.finish();
   }
 }
+
+export const waitFor = 300;

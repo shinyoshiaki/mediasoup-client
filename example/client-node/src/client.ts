@@ -230,7 +230,6 @@ export class Client {
     const params: any = await socketPromise(this.socket)("consumeData", {
       producerId: target,
     });
-    console.warn({ params });
 
     const consumer = await this.recvTransport.consumeData(params);
     return consumer;

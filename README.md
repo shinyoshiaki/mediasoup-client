@@ -24,6 +24,8 @@ import {
   useSdesMid,
   MediaStreamTrack,
 } from "msc-node";
+import { exec } from "child_process";
+import { createSocket } from "dgram";
 import mySignaling from "./my-signaling"; // Our own signaling stuff.
 
 // Create a device with RtpCapabilities
@@ -140,6 +142,11 @@ sendTransport.on(
 );
 
 // Produce our rtp video.
+exec(
+  "ffmpeg -re -f lavfi -i testsrc=size=640x480:rate=30 -vcodec libvpx -cpu-used 5 -deadline 1 -g 10 -error-resilient 1 -auto-alt-ref 1 -f rtp rtp://127.0.0.1:5030"
+);
+const udp = createSocket("udp4");
+udp.bind(5030);
 const rtpTrack = new MediaStreamTrack({ kind: "video" });
 udp.addListener("message", (data) => {
   rtpTrack.writeRtp(data);

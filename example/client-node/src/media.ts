@@ -24,9 +24,8 @@ socket.on("connect", async () => {
   await client.setupProducerTransport();
 
   client.onProduceMedia.subscribe(async (target) => {
-    const consumer = await client.consume(target);
-    const track = consumer.track as unknown as MediaStreamTrack;
-    track.onReceiveRtp.subscribe((rtp) => {
+    const consumer = await client.consume(target);    
+    consumer.track.onReceiveRtp.subscribe((rtp) => {
       udp.send(rtp.serialize(), 4002);
     });
   });

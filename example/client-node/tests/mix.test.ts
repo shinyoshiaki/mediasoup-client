@@ -60,7 +60,7 @@ describe("mix", () => {
 
     client.onProduceMedia.subscribe(async (target) => {
       const consumer = await client.consume(target);
-      const track = consumer.track as unknown as MediaStreamTrack;
+      const track = consumer.track;
       track.onReceiveRtp.once((rtp) => {
         if (track.kind === "audio") {
           expect(rtp.payload.toString()).toBe("audio");

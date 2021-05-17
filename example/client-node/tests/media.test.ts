@@ -32,17 +32,15 @@ describe("media", () => {
     client.onProduceMedia.subscribe(async (target) => {
       const track = (await client.consume(target)).track;
       expect(client.recvTransport.pc.transceivers.length).toBe(2); // mid 0 & mid probator
-      (track as unknown as MediaStreamTrack).onReceiveRtp.subscribe(
-        async () => {
-          try {
-            udp.close();
-            process.kill(child.pid + 1);
-          } catch (error) {}
-          socket.close();
-          await new Promise((r) => setTimeout(r, waitFor));
-          done();
-        }
-      );
+      track.onReceiveRtp.subscribe(async () => {
+        try {
+          udp.close();
+          process.kill(child.pid + 1);
+        } catch (error) {}
+        socket.close();
+        await new Promise((r) => setTimeout(r, waitFor));
+        done();
+      });
     });
 
     const track = new MediaStreamTrack({ kind: "video" });
@@ -106,8 +104,7 @@ describe("media", () => {
     client.onProduceMedia.subscribe(async (target) => {
       const consumer = await client.consume(target);
       expect(client.recvTransport.pc.transceivers.length).toBe(1);
-      const track = consumer.track as unknown as MediaStreamTrack;
-      track.onReceiveRtp.subscribe(async (rtp) => {
+      consumer.track.onReceiveRtp.subscribe(async (rtp) => {
         expect(rtp.payload.toString()).toBe("audio");
         socket.close();
         await new Promise((r) => setTimeout(r, waitFor));
@@ -156,8 +153,7 @@ describe("media", () => {
     client.onProduceMedia.subscribe(async (target) => {
       const toBe = index++;
       const consumer = await client.consume(target);
-      const track = consumer.track as unknown as MediaStreamTrack;
-      track.onReceiveRtp.once((rtp) => {
+      consumer.track.onReceiveRtp.once((rtp) => {
         expect(rtp.payload.toString()).toBe(toBe.toString());
         counter.done();
       });
@@ -231,9 +227,8 @@ describe("media", () => {
 
     client.onProduceMedia.subscribe(async (target) => {
       const consumer = await client.consume(target);
-      const track = consumer.track as unknown as MediaStreamTrack;
-      track.onReceiveRtp.once((rtp) => {
-        if (track.kind === "audio") {
+      consumer.track.onReceiveRtp.once((rtp) => {
+        if (consumer.track.kind === "audio") {
           expect(rtp.payload.toString()).toBe("audio");
         } else {
           expect(rtp.payload).toBeTruthy();

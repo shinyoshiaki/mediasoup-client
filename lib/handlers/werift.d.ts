@@ -1,4 +1,4 @@
-import { RTCRtpCodecParameters, RTCRtpHeaderExtensionParameters } from "werift";
+import { RTCPeerConnection, RTCRtpCodecParameters, RTCRtpHeaderExtensionParameters } from "werift";
 import { HandlerInterface, HandlerReceiveDataChannelOptions, HandlerReceiveDataChannelResult, HandlerReceiveOptions, HandlerReceiveResult, HandlerRunOptions, HandlerSendDataChannelOptions, HandlerSendDataChannelResult, HandlerSendOptions, HandlerSendResult } from "./HandlerInterface";
 import { SctpCapabilities } from "../SctpParameters";
 import { RtpCapabilities } from "../RtpParameters";
@@ -18,7 +18,7 @@ export declare class Werift extends HandlerInterface {
     private _remoteSdp?;
     private _sendingRtpParametersByKind?;
     private _sendingRemoteRtpParametersByKind?;
-    private _pc;
+    _pc: RTCPeerConnection;
     private readonly _mapMidTransceiver;
     private _hasDataChannelMediaSection;
     private _nextSendSctpStreamId;

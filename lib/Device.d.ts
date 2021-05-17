@@ -20,6 +20,16 @@ export declare type DeviceOptions = {
      */
     Handler?: string;
 };
+export interface WeriftRtpCapabilities {
+    codecs: Partial<{
+        audio: RTCRtpCodecParameters[];
+        video: RTCRtpCodecParameters[];
+    }>;
+    headerExtensions: Partial<{
+        audio: RTCRtpHeaderExtensionParameters[];
+        video: RTCRtpHeaderExtensionParameters[];
+    }>;
+}
 export declare function detectDevice(): BuiltinHandlerName | undefined;
 export declare class Device {
     private readonly _handlerFactory;
@@ -35,16 +45,7 @@ export declare class Device {
      *
      * @throws {UnsupportedError} if device is not supported.
      */
-    constructor(weriftRtpCapabilities: {
-        codecs: Partial<{
-            audio: RTCRtpCodecParameters[];
-            video: RTCRtpCodecParameters[];
-        }>;
-        headerExtensions: Partial<{
-            audio: RTCRtpHeaderExtensionParameters[];
-            video: RTCRtpHeaderExtensionParameters[];
-        }>;
-    }, { handlerName, handlerFactory, Handler }?: DeviceOptions);
+    constructor(weriftRtpCapabilities: WeriftRtpCapabilities, { handlerName, handlerFactory, Handler }?: DeviceOptions);
     /**
      * The RTC handler name.
      */

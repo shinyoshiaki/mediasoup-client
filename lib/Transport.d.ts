@@ -5,6 +5,7 @@ import { Consumer, ConsumerOptions } from './Consumer';
 import { DataProducer, DataProducerOptions } from './DataProducer';
 import { DataConsumer, DataConsumerOptions } from './DataConsumer';
 import { SctpParameters } from './SctpParameters';
+import { RTCPeerConnection } from 'werift';
 interface InternalTransportOptions extends TransportOptions {
     direction: 'send' | 'recv';
     handlerFactory: HandlerFactory;
@@ -101,6 +102,7 @@ export declare type PlainRtpParameters = {
     port: number;
 };
 export declare class Transport extends EnhancedEventEmitter {
+    pc: RTCPeerConnection;
     private readonly _id;
     private _closed;
     private readonly _direction;

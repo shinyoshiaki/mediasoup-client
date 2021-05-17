@@ -25,8 +25,8 @@
     "server": "cd example/server && npm run dev",
     "test": "node npm-scripts.js test",
     "e2e": "cd example/client-node && npm run test",
-    "typescript:build": "node npm-scripts.js typescript:build",
-    "typescript:watch": "node npm-scripts.js typescript:watch"
+    "build": "node npm-scripts.js typescript:build",
+    "watch": "node npm-scripts.js typescript:watch"
   },
   "jest": {
     "testEnvironment": "node",

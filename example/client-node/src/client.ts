@@ -46,9 +46,7 @@ export class Client {
     const data = await socketPromise(this.socket)("getRouterRtpCapabilities");
     await this.loadDevice(data);
 
-    this.socket.on("disconnect", () => {
-      console.log("Disconnected");
-    });
+    this.socket.on("disconnect", () => {});
 
     this.socket.on("connect_error", (error: Error) => {
       console.error("could not connect to %s%s (%s)", error.message);

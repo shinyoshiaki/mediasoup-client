@@ -19,13 +19,14 @@
     "src"
   ],
   "scripts": {
+    "build": "node npm-scripts.js typescript:build",
     "client": "cd example/client-browser && npm run dev",
     "coverage": "node npm-scripts.js coverage",
+    "e2e": "cd example/client-node && npm run test",
     "lint": "node npm-scripts.js lint",
     "server": "cd example/server && npm run dev",
     "test": "node npm-scripts.js test",
-    "e2e": "cd example/client-node && npm run test",
-    "build": "node npm-scripts.js typescript:build",
+    "type": "tsc --noEmit",
     "watch": "node npm-scripts.js typescript:watch"
   },
   "jest": {

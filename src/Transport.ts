@@ -10,7 +10,7 @@ import { Consumer, ConsumerOptions } from './Consumer';
 import { DataProducer, DataProducerOptions } from './DataProducer';
 import { DataConsumer, DataConsumerOptions } from './DataConsumer';
 import { SctpParameters } from './SctpParameters';
-import { RTCPeerConnection } from 'werift';
+import { MediaStreamTrack, RTCPeerConnection } from 'werift';
 
 interface InternalTransportOptions extends TransportOptions
 {
@@ -606,7 +606,7 @@ export class Transport extends EnhancedEventEmitter
 						localId,
 						producerId,
 						rtpReceiver,
-						track,
+						track : track as unknown as MediaStreamTrack,
 						rtpParameters,
 						appData
 					});

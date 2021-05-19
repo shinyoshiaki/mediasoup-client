@@ -6,6 +6,8 @@ Node.js client side (not browser,just node.js) library for building [mediasoup][
 
 `npm install msc-node`
 
+ requires at least Node.js 14
+
 ## Usage Example
 
 ```js

@@ -2,6 +2,8 @@
 
 Node.js client side (not browser,just node.js) library for building [mediasoup][mediasoup-website] based applications.
 
+Using [werift-webrtc](https://github.com/shinyoshiaki/werift-webrtc) for webrtc protocol stack
+
 ## Installation
 
 `npm install msc-node`

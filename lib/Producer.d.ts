@@ -149,4 +149,3 @@ export declare class Producer extends EnhancedEventEmitter {
     private _handleTrack;
     private _destroyTrack;
 }
-//# sourceMappingURL=Producer.d.ts.map

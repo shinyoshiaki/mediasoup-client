@@ -96,4 +96,3 @@ export declare class DataProducer extends EnhancedEventEmitter {
     send(data: any): void;
     private _handleDataChannel;
 }
-//# sourceMappingURL=DataProducer.d.ts.map

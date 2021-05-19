@@ -7,7 +7,7 @@ export { types };
 /**
  * Expose mediasoup-client version.
  */
-export declare const version = "3.6.30";
+export declare const version = "0.0.3";
 /**
  * Expose Device class and detectDevice() helper.
  */
@@ -17,4 +17,3 @@ export { Device, detectDevice };
  */
 export { parse as parseScalabilityMode } from './scalabilityModes';
 export * from 'werift';
-//# sourceMappingURL=index.d.ts.map

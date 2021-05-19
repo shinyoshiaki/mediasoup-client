@@ -8,4 +8,3 @@ export declare class Logger {
     get warn(): debug.Debugger;
     get error(): debug.Debugger;
 }
-//# sourceMappingURL=Logger.d.ts.map

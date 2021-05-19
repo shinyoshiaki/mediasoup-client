@@ -41,4 +41,3 @@ export declare class Safari12 extends HandlerInterface {
     private _assertSendDirection;
     private _assertRecvDirection;
 }
-//# sourceMappingURL=Safari12.d.ts.map

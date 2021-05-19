@@ -41,4 +41,3 @@ export declare class Firefox60 extends HandlerInterface {
     private _assertSendDirection;
     private _assertRecvDirection;
 }
-//# sourceMappingURL=Firefox60.d.ts.map

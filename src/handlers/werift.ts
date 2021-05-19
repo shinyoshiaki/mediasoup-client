@@ -1,11 +1,12 @@
+/* eslint-disable */
+
 import {
   RTCPeerConnection,
   RTCSessionDescription,
   RTCRtpTransceiver,
   MediaStreamTrack,
-  useSdesMid,
-  useAbsSendTime,
   RTCRtpCodecParameters,
+  RTCRtpHeaderExtensionParameters,
 } from "werift";
 import * as utils from "../utils";
 import * as sdpTransform from "sdp-transform";
@@ -29,7 +30,9 @@ import {
 import { SctpCapabilities, SctpStreamParameters } from "../SctpParameters";
 import {
   RtpCapabilities,
+  RtpCodecCapability,
   RtpEncodingParameters,
+  RtpHeaderExtension,
   RtpParameters,
 } from "../RtpParameters";
 import { DtlsRole, IceParameters } from "../Transport";
@@ -48,21 +51,39 @@ export class Werift extends HandlerInterface {
   // Generic sending RTP parameters for audio and video suitable for the SDP
   // remote answer.
   private _sendingRemoteRtpParametersByKind?: { [key: string]: RtpParameters };
-  private _pc!: RTCPeerConnection;
+  _pc!: RTCPeerConnection;
   // Map of RTCTransceivers indexed by MID.
-  private readonly _mapMidTransceiver: Map<
-    string,
-    RTCRtpTransceiver
-  > = new Map();
+  private readonly _mapMidTransceiver: Map<string, RTCRtpTransceiver> =
+    new Map();
   private _hasDataChannelMediaSection = false;
   private _nextSendSctpStreamId = 0;
   private _transportReady = false;
 
-  static createFactory() {
-    return () => new Werift();
+  static createFactory(nativeRtpCapabilities: {
+    codecs: Partial<{
+      audio: RTCRtpCodecParameters[];
+      video: RTCRtpCodecParameters[];
+    }>;
+    headerExtensions: Partial<{
+      audio: RTCRtpHeaderExtensionParameters[];
+      video: RTCRtpHeaderExtensionParameters[];
+    }>;
+  }) {
+    return () => new Werift(nativeRtpCapabilities);
   }
 
-  constructor() {
+  constructor(
+    public nativeRtpCapabilities: {
+      codecs: Partial<{
+        audio: RTCRtpCodecParameters[];
+        video: RTCRtpCodecParameters[];
+      }>;
+      headerExtensions: Partial<{
+        audio: RTCRtpHeaderExtensionParameters[];
+        video: RTCRtpHeaderExtensionParameters[];
+      }>;
+    }
+  ) {
     super();
   }
 
@@ -82,58 +103,52 @@ export class Werift extends HandlerInterface {
   }
 
   async getNativeRtpCapabilities(): Promise<RtpCapabilities> {
+    let preferredPayloadType = 96;
+    const codecs: RtpCodecCapability[] = [
+      ...(this.nativeRtpCapabilities.codecs.video || []).map(
+        ({ mimeType, clockRate, rtcpFeedback }) => {
+          const codec: RtpCodecCapability = {
+            kind: "video",
+            mimeType,
+            clockRate,
+            rtcpFeedback,
+            preferredPayloadType: preferredPayloadType++,
+          };
+          return codec;
+        }
+      ),
+      ...(this.nativeRtpCapabilities.codecs.audio || []).map(
+        ({ mimeType, clockRate, channels }) => {
+          const codec: RtpCodecCapability = {
+            kind: "audio",
+            mimeType,
+            clockRate,
+            channels,
+            preferredPayloadType: preferredPayloadType++,
+          };
+          return codec;
+        }
+      ),
+    ];
+    let preferredId = 1;
+    const headerExtensions: RtpHeaderExtension[] = [
+      ...(this.nativeRtpCapabilities.headerExtensions.audio || []).map(
+        ({ uri }) => {
+          const ext: RtpHeaderExtension = { uri, preferredId: preferredId++ };
+          return ext;
+        }
+      ),
+      ...(this.nativeRtpCapabilities.headerExtensions.video || []).map(
+        ({ uri }) => {
+          const ext: RtpHeaderExtension = { uri, preferredId: preferredId++ };
+          return ext;
+        }
+      ),
+    ];
+
     const caps: RtpCapabilities = {
-      codecs: [
-        {
-          kind: "audio",
-          mimeType: "audio/opus",
-          clockRate: 48000,
-          channels: 2,
-          preferredPayloadType: 97,
-        },
-        {
-          kind: "video",
-          mimeType: "video/VP8",
-          clockRate: 90000,
-          preferredPayloadType: 98,
-          rtcpFeedback: [
-            { type: "ccm", parameter: "fir" },
-            { type: "nack" },
-            { type: "nack", parameter: "pli" },
-            { type: "goog-remb" },
-          ],
-        },
-      ],
-      headerExtensions: [
-        {
-          kind: "audio",
-          uri: "urn:ietf:params:rtp-hdrext:sdes:mid",
-          preferredId: 1,
-          preferredEncrypt: false,
-          direction: "sendrecv",
-        },
-        {
-          kind: "video",
-          uri: "urn:ietf:params:rtp-hdrext:sdes:mid",
-          preferredId: 1,
-          preferredEncrypt: false,
-          direction: "sendrecv",
-        },
-        {
-          kind: "audio",
-          uri: "http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time",
-          preferredId: 4,
-          preferredEncrypt: false,
-          direction: "sendrecv",
-        },
-        {
-          kind: "video",
-          uri: "http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time",
-          preferredId: 4,
-          preferredEncrypt: false,
-          direction: "sendrecv",
-        },
-      ],
+      codecs,
+      headerExtensions,
     };
 
     return caps;
@@ -192,27 +207,7 @@ export class Werift extends HandlerInterface {
       bundlePolicy: "max-bundle",
       rtcpMuxPolicy: "require",
       sdpSemantics: "unified-plan",
-      headerExtensions: {
-        video: [
-          useSdesMid(),
-          useAbsSendTime(),          
-        ],
-      },
-      codecs: {
-        video: [
-          new RTCRtpCodecParameters({
-            mimeType: "video/VP8",
-            clockRate: 90000,
-            payloadType: 98,
-            rtcpFeedback: [
-              { type: "ccm", parameter: "fir" },
-              { type: "nack" },
-              { type: "nack", parameter: "pli" },
-              { type: "goog-remb" },              
-            ],
-          }),
-        ],
-      },
+      ...this.nativeRtpCapabilities,
       ...additionalSettings,
     });
 
@@ -279,12 +274,12 @@ export class Werift extends HandlerInterface {
 
     const mediaSectionIdx = this._remoteSdp!.getNextMediaSectionIdx();
     const transceiver = this._pc.addTransceiver(
-      (track as unknown) as MediaStreamTrack,
+      track as unknown as MediaStreamTrack,
       {
         direction: "sendonly",
       }
     );
-    let offer = await this._pc.createOffer();
+    const offer = await this._pc.createOffer();
     let localSdpObject = sdpTransform.parse(offer.sdp);
     let offerMediaObject;
 
@@ -292,7 +287,7 @@ export class Werift extends HandlerInterface {
       await this._setupTransport({ localDtlsRole: "server", localSdpObject });
     }
 
-    console.log("send() | calling pc.setLocalDescription() [offer:%o]", offer);
+    logger.debug("send() | calling pc.setLocalDescription() [offer:%o]", offer);
 
     await this._pc.setLocalDescription(offer);
 
@@ -319,7 +314,7 @@ export class Werift extends HandlerInterface {
     // Set RTP encodings by parsing the SDP offer and complete them with given
     // one if just a single encoding has been given.
     else if (encodings.length === 1) {
-      let newEncodings = sdpUnifiedPlanUtils.getRtpEncodings({
+      const newEncodings = sdpUnifiedPlanUtils.getRtpEncodings({
         offerMediaObject,
       });
 
@@ -343,7 +338,7 @@ export class Werift extends HandlerInterface {
 
     const answer = { type: "answer", sdp: this._remoteSdp!.getSdp() } as const;
 
-    console.log(
+    logger.debug(
       "send() | calling pc.setRemoteDescription() [answer:%o]",
       answer
     );
@@ -496,7 +491,10 @@ export class Werift extends HandlerInterface {
       answerMediaObject,
     });
 
-    answer = { type: "answer", sdp: sdpTransform.write(localSdpObject) };
+    answer = new RTCSessionDescription(
+      sdpTransform.write(localSdpObject),
+      "answer"
+    );
 
     if (!this._transportReady)
       await this._setupTransport({ localDtlsRole: "client", localSdpObject });
@@ -522,7 +520,7 @@ export class Werift extends HandlerInterface {
       // todo fix
       track: transceiver.receiver.tracks[0] as any,
       // todo fix
-      rtpReceiver: (transceiver.receiver as unknown) as RTCRtpReceiver,
+      rtpReceiver: transceiver.receiver as unknown as RTCRtpReceiver,
     };
   }
 

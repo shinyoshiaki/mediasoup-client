@@ -120,4 +120,3 @@ export declare function canSend(kind: MediaKind, extendedRtpCapabilities: any): 
  * capabilities.
  */
 export declare function canReceive(rtpParameters: RtpParameters, extendedRtpCapabilities: any): boolean;
-//# sourceMappingURL=ortc.d.ts.map

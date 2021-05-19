@@ -3,6 +3,7 @@ import { Transport, TransportOptions } from './Transport';
 import { HandlerFactory } from './handlers/HandlerInterface';
 import { RtpCapabilities, MediaKind } from './RtpParameters';
 import { SctpCapabilities } from './SctpParameters';
+import { RTCRtpCodecParameters, RTCRtpHeaderExtensionParameters } from 'werift';
 export declare type BuiltinHandlerName = 'Chrome74' | 'Chrome70' | 'Chrome67' | 'Chrome55' | 'Firefox60' | 'Safari12' | 'Safari11' | 'Edge11' | 'ReactNative' | 'werift';
 export declare type DeviceOptions = {
     /**
@@ -19,6 +20,16 @@ export declare type DeviceOptions = {
      */
     Handler?: string;
 };
+export interface WeriftRtpCapabilities {
+    codecs: Partial<{
+        audio: RTCRtpCodecParameters[];
+        video: RTCRtpCodecParameters[];
+    }>;
+    headerExtensions: Partial<{
+        audio: RTCRtpHeaderExtensionParameters[];
+        video: RTCRtpHeaderExtensionParameters[];
+    }>;
+}
 export declare function detectDevice(): BuiltinHandlerName | undefined;
 export declare class Device {
     private readonly _handlerFactory;
@@ -34,7 +45,7 @@ export declare class Device {
      *
      * @throws {UnsupportedError} if device is not supported.
      */
-    constructor({ handlerName, handlerFactory, Handler }?: DeviceOptions);
+    constructor(weriftRtpCapabilities: WeriftRtpCapabilities, { handlerName, handlerFactory, Handler }?: DeviceOptions);
     /**
      * The RTC handler name.
      */
@@ -90,4 +101,3 @@ export declare class Device {
     createRecvTransport({ id, iceParameters, iceCandidates, dtlsParameters, sctpParameters, iceServers, iceTransportPolicy, additionalSettings, proprietaryConstraints, appData }: TransportOptions): Transport;
     private _createTransport;
 }
-//# sourceMappingURL=Device.d.ts.map

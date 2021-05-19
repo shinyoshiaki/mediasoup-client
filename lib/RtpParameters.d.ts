@@ -308,4 +308,3 @@ export declare type RtcpParameters = {
      */
     mux?: boolean;
 };
-//# sourceMappingURL=RtpParameters.d.ts.map

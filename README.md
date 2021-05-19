@@ -2,9 +2,9 @@
 
 Node.js client side (not browser,just node.js) library for building [mediasoup][mediasoup-website] based applications.
 
-## Website and Documentation
+## Installation
 
-- [mediasoup.org][mediasoup-website]
+`npm install msc-node`
 
 ## Usage Example
 

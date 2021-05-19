@@ -6,10 +6,6 @@ Node.js client side (not browser,just node.js) library for building [mediasoup][
 
 - [mediasoup.org][mediasoup-website]
 
-## Support Forum
-
-- [mediasoup.discourse.group][mediasoup-discourse]
-
 ## Usage Example
 
 ```js
@@ -163,6 +159,8 @@ const dataProducer = await sendTransport.produceData({
 ## Authors
 
 - shinyoshiaki [[github](https://github.com/shinyoshiaki/)]
+
+## Original Authors
 - Iñaki Baz Castillo [[website](https://inakibaz.me)|[github](https://github.com/ibc/)]
 - José Luis Millán [[github](https://github.com/jmillan/)]
 

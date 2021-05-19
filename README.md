@@ -168,6 +168,15 @@ const dataProducer = await sendTransport.produceData({
 
 [ISC](./LICENSE)
 
+## Original License
+- https://github.com/versatica/mediasoup-client
+
+```
+ISC License
+
+Copyright © 2015, Iñaki Baz Castillo <ibc@aliax.net>
+```
+
 [mediasoup-website]: https://mediasoup.org
 [mediasoup-discourse]: https://mediasoup.discourse.group
 [npm-shield-mediasoup-client]: https://img.shields.io/npm/v/mediasoup-client.svg

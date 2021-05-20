@@ -24,7 +24,7 @@
     "coverage": "node npm-scripts.js coverage",
     "e2e": "cd example/client-node && npm run test",
     "lint": "node npm-scripts.js lint",
-    "server": "cd example/server && npm run dev",
+    "server": "cd example/server && DEBUG=* npm run dev",
     "test": "node npm-scripts.js test",
     "type": "tsc --noEmit",
     "watch": "node npm-scripts.js typescript:watch"

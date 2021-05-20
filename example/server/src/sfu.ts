@@ -114,7 +114,7 @@ export class SFU {
           kind,
           rtpParameters,
         });
-        producer.enableTraceEvent(["keyframe"]);
+        // producer.enableTraceEvent(["keyframe"]);
         producer.on("trace", (trace) => {
           console.log("trace", trace);
         });

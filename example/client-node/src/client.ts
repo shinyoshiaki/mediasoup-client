@@ -1,5 +1,7 @@
 import * as mediasoup from "../../../src";
 import {
+  PictureLossIndication,
+  RtcpPayloadSpecificFeedback,
   RTCRtpCodecParameters,
   useAbsSendTime,
   useFIR,
@@ -135,6 +137,17 @@ export class Client {
         default:
           break;
       }
+    });
+
+    this.sendTransport.pc.onTransceiverAdded.subscribe((transceiver) => {
+      transceiver.sender.onRtcp.subscribe((rtcp) => {
+        if (rtcp.type === RtcpPayloadSpecificFeedback.type) {
+          const { feedback } = rtcp as RtcpPayloadSpecificFeedback;
+          if (feedback.count === PictureLossIndication.count) {
+            console.log(rtcp);
+          }
+        }
+      });
     });
   };
 

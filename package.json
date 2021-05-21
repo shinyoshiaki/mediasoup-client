@@ -1,6 +1,6 @@
 {
   "name": "msc-node",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "mediasoup client side Node.js library",
   "repository": {
     "type": "git",

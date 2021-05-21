@@ -7,7 +7,7 @@ export { types };
 /**
  * Expose mediasoup-client version.
  */
-export declare const version = "0.0.3";
+export declare const version = "0.0.4";
 /**
  * Expose Device class and detectDevice() helper.
  */

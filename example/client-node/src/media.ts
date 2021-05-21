@@ -3,6 +3,8 @@ import { createSocket } from "dgram";
 import { Client } from "./client";
 import {
   MediaStreamTrack,
+  PictureLossIndication,
+  RtcpPayloadSpecificFeedback,
   RTCRtpCodecParameters,
   useAbsSendTime,
   useFIR,
@@ -56,8 +58,16 @@ socket.on("connect", async () => {
   });
 
   const track = new MediaStreamTrack({ kind: "video" });
-  await client.publishMedia(track as any);
+  const producer = await client.publishMedia(track as any);
   udp.addListener("message", (data) => {
     track.writeRtp(data);
+  });
+  producer.rtpSender.onRtcp.subscribe((rtcp) => {
+    if (rtcp.type === RtcpPayloadSpecificFeedback.type) {
+      const { feedback } = rtcp as RtcpPayloadSpecificFeedback;
+      if (feedback.count === PictureLossIndication.count) {
+        console.log(rtcp);
+      }
+    }
   });
 });

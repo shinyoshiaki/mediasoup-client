@@ -138,17 +138,6 @@ export class Client {
           break;
       }
     });
-
-    this.sendTransport.pc.onTransceiverAdded.subscribe((transceiver) => {
-      transceiver.sender.onRtcp.subscribe((rtcp) => {
-        if (rtcp.type === RtcpPayloadSpecificFeedback.type) {
-          const { feedback } = rtcp as RtcpPayloadSpecificFeedback;
-          if (feedback.count === PictureLossIndication.count) {
-            console.log(rtcp);
-          }
-        }
-      });
-    });
   };
 
   async publishMedia(track: MediaStreamTrack) {

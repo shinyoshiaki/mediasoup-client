@@ -1,5 +1,6 @@
 import { EnhancedEventEmitter } from './EnhancedEventEmitter';
 import { RtpCodecCapability, RtpParameters, RtpEncodingParameters } from './RtpParameters';
+import { RTCRtpSender } from 'werift/lib/webrtc/src/media/rtpSender';
 export declare type ProducerOptions = {
     track?: MediaStreamTrack;
     encodings?: RtpEncodingParameters[];

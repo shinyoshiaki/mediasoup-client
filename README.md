@@ -2,13 +2,13 @@
 
 Node.js client side (not browser,just node.js) library for building [mediasoup][mediasoup-website] based applications.
 
-## Website and Documentation
+Using [werift-webrtc](https://github.com/shinyoshiaki/werift-webrtc) for webrtc protocol stack
 
-- [mediasoup.org][mediasoup-website]
+## Installation
 
-## Support Forum
+`npm install msc-node`
 
-- [mediasoup.discourse.group][mediasoup-discourse]
+ requires at least Node.js 14
 
 ## Usage Example
 
@@ -163,12 +163,23 @@ const dataProducer = await sendTransport.produceData({
 ## Authors
 
 - shinyoshiaki [[github](https://github.com/shinyoshiaki/)]
+
+## Original Authors
 - Iñaki Baz Castillo [[website](https://inakibaz.me)|[github](https://github.com/ibc/)]
 - José Luis Millán [[github](https://github.com/jmillan/)]
 
 ## License
 
 [ISC](./LICENSE)
+
+## Original License
+- https://github.com/versatica/mediasoup-client
+
+```
+ISC License
+
+Copyright © 2015, Iñaki Baz Castillo <ibc@aliax.net>
+```
 
 [mediasoup-website]: https://mediasoup.org
 [mediasoup-discourse]: https://mediasoup.discourse.group

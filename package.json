@@ -1,6 +1,6 @@
 {
   "name": "msc-node",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "mediasoup client side Node.js library",
   "repository": {
     "type": "git",
@@ -24,7 +24,7 @@
     "coverage": "node npm-scripts.js coverage",
     "e2e": "cd example/client-node && npm run test",
     "lint": "node npm-scripts.js lint",
-    "server": "cd example/server && npm run dev",
+    "server": "cd example/server && DEBUG=* npm run dev",
     "test": "node npm-scripts.js test",
     "type": "tsc --noEmit",
     "watch": "node npm-scripts.js typescript:watch"
@@ -44,7 +44,7 @@
     "h264-profile-level-id": "^1.0.1",
     "sdp-transform": "^2.14.1",
     "supports-color": "^8.1.1",
-    "werift": "^0.10.2"
+    "werift": "^0.10.3"
   },
   "devDependencies": {
     "@types/sdp-transform": "^2.4.4",

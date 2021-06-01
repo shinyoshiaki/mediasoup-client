@@ -3,6 +3,7 @@ import { ProducerCodecOptions } from '../Producer';
 import { IceParameters, IceCandidate, DtlsParameters } from '../Transport';
 import { RtpCapabilities, RtpCodecCapability, RtpParameters, RtpEncodingParameters } from '../RtpParameters';
 import { SctpCapabilities, SctpParameters, SctpStreamParameters } from '../SctpParameters';
+import { RTCRtpSender } from 'werift/lib/webrtc/src/media/rtpSender';
 export declare type HandlerFactory = () => HandlerInterface;
 export declare type HandlerRunOptions = {
     direction: 'send' | 'recv';

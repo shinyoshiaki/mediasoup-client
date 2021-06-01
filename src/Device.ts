@@ -19,6 +19,8 @@ import { Edge11 } from './handlers/Edge11';
 import { ReactNative } from './handlers/ReactNative';
 import { RtpCapabilities, MediaKind } from './RtpParameters';
 import { SctpCapabilities } from './SctpParameters';
+import { Werift } from './handlers/werift';
+import { RTCRtpCodecParameters, RTCRtpHeaderExtensionParameters } from 'werift';
 
 const logger = new Logger('Device');
 
@@ -31,7 +33,8 @@ export type BuiltinHandlerName =
 	| 'Safari12'
 	| 'Safari11'
 	| 'Edge11'
-	| 'ReactNative';
+	| 'ReactNative'
+	| 'werift'
 
 export type DeviceOptions =
 {
@@ -53,6 +56,18 @@ export type DeviceOptions =
 interface InternalTransportOptions extends TransportOptions
 {
 	direction: 'send' | 'recv';
+}
+
+export interface WeriftRtpCapabilities
+{
+	codecs: Partial<{
+		audio: RTCRtpCodecParameters[];
+		video: RTCRtpCodecParameters[];
+	}>;
+	headerExtensions: Partial<{
+		audio: RTCRtpHeaderExtensionParameters[];
+		video: RTCRtpHeaderExtensionParameters[];
+	}>;
 }
 
 export function detectDevice(): BuiltinHandlerName | undefined
@@ -168,9 +183,7 @@ export function detectDevice(): BuiltinHandlerName | undefined
 	// Unknown device.
 	else
 	{
-		logger.warn('this._detectDevice() | unknown device');
-
-		return undefined;
+		return 'werift';
 	}
 }
 
@@ -199,7 +212,8 @@ export class Device
 	 *
 	 * @throws {UnsupportedError} if device is not supported.
 	 */
-	constructor({ handlerName, handlerFactory, Handler }: DeviceOptions = {})
+	constructor(weriftRtpCapabilities:WeriftRtpCapabilities, 
+		{ handlerName, handlerFactory, Handler }: DeviceOptions = {})
 	{
 		logger.debug('constructor()');
 
@@ -270,6 +284,9 @@ export class Device
 					break;
 				case 'ReactNative':
 					this._handlerFactory = ReactNative.createFactory();
+					break;
+				case 'werift':
+					this._handlerFactory = Werift.createFactory(weriftRtpCapabilities) as any;
 					break;
 				default:
 					throw new TypeError(`unknown handlerName "${handlerName}"`);

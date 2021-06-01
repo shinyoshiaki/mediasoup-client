@@ -1,4 +1,4 @@
-/node_modules/
+node_modules/
 /coverage/
 
 # Vim temporal files.
@@ -7,6 +7,6 @@
 
 # Mac Stuff.
 .DS_Store
-
-# Vistual Studio Code stuff.
-/.vscode/
+example/
+yarn.lock
+package-lock.json

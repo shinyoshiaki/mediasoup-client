@@ -20,3 +20,4 @@ export { Device, detectDevice };
  * Expose parseScalabilityMode() function.
  */
 export { parse as parseScalabilityMode } from './scalabilityModes';
+export * from 'werift';

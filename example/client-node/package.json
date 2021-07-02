@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "media": "DEBUG=werift* ts-node-dev src/media.ts",
-    "test": "jest --forceExit --runInBand"
+    "test": "jest --forceExit --runInBand",
+    "type": "tsc --noEmit -p ./tsconfig.json"
   },
   "jest": {
     "preset": "ts-jest",
@@ -29,6 +30,6 @@
     "ts-node": "^9.1.1",
     "ts-node-dev": "^1.1.6",
     "tslib": "^2.2.0",
-    "typescript": "^4.2.4"
+    "typescript": "^3.8"
   }
 }

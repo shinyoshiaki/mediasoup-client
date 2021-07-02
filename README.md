@@ -8,7 +8,7 @@ Using [werift-webrtc](https://github.com/shinyoshiaki/werift-webrtc) for webrtc 
 
 `npm install msc-node`
 
- requires at least Node.js 14
+requires at least Node.js 14
 
 ## Usage Example
 
@@ -158,6 +158,19 @@ const dataProducer = await sendTransport.produceData({
   ordered: true,
   label: "foo",
 });
+
+...
+
+const consumer = await recvTransport.consume({
+  id,
+  producerId,
+  kind,
+  rtpParameters,
+});
+consumer.track.onReceiveRtp.subscribe((rtp) => {
+  // send rtp packet
+  udp.send(rtp.serialize(), 4002);
+});
 ```
 
 ## Authors
@@ -165,6 +178,7 @@ const dataProducer = await sendTransport.produceData({
 - shinyoshiaki [[github](https://github.com/shinyoshiaki/)]
 
 ## Original Authors
+
 - Iñaki Baz Castillo [[website](https://inakibaz.me)|[github](https://github.com/ibc/)]
 - José Luis Millán [[github](https://github.com/jmillan/)]
 
@@ -173,6 +187,7 @@ const dataProducer = await sendTransport.produceData({
 [ISC](./LICENSE)
 
 ## Original License
+
 - https://github.com/versatica/mediasoup-client
 
 ```

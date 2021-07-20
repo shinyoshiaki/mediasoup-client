@@ -1,6 +1,6 @@
 {
   "name": "msc-node",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "mediasoup client side Node.js library",
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   ],
   "scripts": {
     "build": "node npm-scripts.js typescript:build",
+    "deploy": "yarn build && yarn publish",
     "client": "cd example/client-browser && npm run dev",
     "coverage": "node npm-scripts.js coverage",
     "e2e": "cd example/client-node && npm run test",

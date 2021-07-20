@@ -1,6 +1,6 @@
 {
   "name": "msc-node",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "mediasoup client side Node.js library",
   "repository": {
     "type": "git",
@@ -47,11 +47,11 @@
     "werift": "^0.12.1"
   },
   "devDependencies": {
+    "@types/node": "^16.3.2",
     "@types/sdp-transform": "^2.4.4",
     "@types/uuid": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
-    "@types/node": "^16.3.2",
     "eslint": "^7.24.0",
     "eslint-plugin-jest": "^24.3.5",
     "fake-mediastreamtrack": "^1.1.6",

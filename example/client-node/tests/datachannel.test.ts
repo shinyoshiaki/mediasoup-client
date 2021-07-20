@@ -4,7 +4,7 @@ import { socketPromise } from "../src/socket.io-promise";
 import { Counter, waitFor } from "./fixture";
 
 describe("datachannel", () => {
-  test("produce(data) consume", async (done) => {
+  test("produce(data) consume", async()=>new Promise<void>(async (done) => {
     const socket = io.connect("http://127.0.0.1:20000");
 
     await socketPromise(socket)("join");
@@ -27,9 +27,9 @@ describe("datachannel", () => {
     setInterval(() => {
       producer.send("data");
     }, 100);
-  });
+  }));
 
-  test("produce(data) produce(data) consume consume", async (done) => {
+  test("produce(data) produce(data) consume consume", async()=>new Promise<void>(async (done) => {
     const socket = io.connect("http://127.0.0.1:20000");
 
     await socketPromise(socket)("join");
@@ -66,5 +66,5 @@ describe("datachannel", () => {
         producer.send("2");
       }, 100);
     }
-  });
+  }));
 });

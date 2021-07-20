@@ -8,7 +8,7 @@ export type DataProducerOptions =
 	ordered?: boolean;
 	maxPacketLifeTime?: number;
 	maxRetransmits?: number;
-	priority?: RTCPriorityType;
+	priority?: "high" | "low" | "medium" | "very-low";
 	label?: string;
 	protocol?: string;
 	appData?: any;

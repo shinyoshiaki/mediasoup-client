@@ -16,7 +16,7 @@ import {randomPort} from "werift/lib/ice/src/utils"
 import { Counter, waitFor } from "./fixture";
 
 describe("media", () => {
-  test("produce consume", async (done) => {
+  test("produce consume", async()=>new Promise<void>(async (done) => {
     const port=await randomPort()
 
     const child = exec(
@@ -53,9 +53,9 @@ describe("media", () => {
     });
 
     expect(client.sendTransport.pc.transceivers.length).toBe(1);
-  });
+  }));
 
-  test("produce consume unconsume", async (done) => {
+  test("produce consume unconsume", async()=>new Promise<void>(async (done) => {
     const socket = io.connect("http://127.0.0.1:20000");
 
     await socketPromise(socket)("join");
@@ -82,9 +82,9 @@ describe("media", () => {
     const track = new MediaStreamTrack({ kind: "video" });
     await client.publishMedia(track as any);
     expect(client.sendTransport.pc.transceivers.length).toBe(1);
-  });
+  }));
 
-  test("produce(audio) consume", async (done) => {
+  test("produce(audio) consume", async()=>new Promise<void>(async (done) => {
     const socket = io.connect("http://127.0.0.1:20000");
 
     await socketPromise(socket)("join");
@@ -123,9 +123,9 @@ describe("media", () => {
       const rtp = audioRtp.create(Buffer.from("audio"));
       track.writeRtp(rtp);
     }, 1000 / 30);
-  });
+  }));
 
-  test("produce(audio) produce(audio) consume consume", async (done) => {
+  test("produce(audio) produce(audio) consume consume", async()=>new Promise<void>(async (done) => {
     const socket = io.connect("http://127.0.0.1:20000");
 
     await socketPromise(socket)("join");
@@ -183,9 +183,9 @@ describe("media", () => {
 
     expect(client.sendTransport.pc.transceivers.length).toBe(2);
     counter.done();
-  });
+  }));
 
-  test("produce produce(audio) consume consume", async (done) => {
+  test("produce produce(audio) consume consume", async()=>new Promise<void>(async (done) => {
     const port=await randomPort()
     const child = exec(
       `ffmpeg -re -f lavfi -i testsrc=size=640x480:rate=30 -vcodec libvpx -cpu-used 5 -deadline 1 -g 10 -error-resilient 1 -auto-alt-ref 1 -f rtp rtp://127.0.0.1:${port}`
@@ -261,5 +261,5 @@ describe("media", () => {
     client;
     expect(client.sendTransport.pc.transceivers.length).toBe(2);
     counter.done();
-  });
+  }));
 });

@@ -59,7 +59,7 @@ export declare type SctpStreamParameters = {
     /**
      * DataChannel priority.
      */
-    priority?: RTCPriorityType;
+    priority?: "high" | "low" | "medium" | "very-low";
     /**
      * A label which can be used to distinguish this DataChannel from others.
      */

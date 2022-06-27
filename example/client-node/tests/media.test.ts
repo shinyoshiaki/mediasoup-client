@@ -5,6 +5,7 @@ import io from "socket.io-client";
 import { socketPromise } from "../src/socket.io-promise";
 import {
   MediaStreamTrack,
+  randomPort,
   RTCRtpCodecParameters,
   RtpBuilder,
   useFIR,
@@ -12,7 +13,6 @@ import {
   usePLI,
   useREMB,
 } from "../../../src";
-import {randomPort} from "werift/lib/ice/src/utils"
 import { Counter, waitFor } from "./fixture";
 
 describe("media", () => {

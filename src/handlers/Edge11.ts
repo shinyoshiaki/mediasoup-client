@@ -447,6 +447,7 @@ export class Edge11 extends HandlerInterface
 		{ iceServers?: any[]; iceTransportPolicy?: RTCIceTransportPolicy }
 	): void
 	{
+		//@ts-ignore
 		const iceGatherer = new (RTCIceGatherer as any)(
 			{
 				iceServers   : iceServers || [],

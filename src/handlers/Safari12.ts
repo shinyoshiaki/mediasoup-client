@@ -220,7 +220,7 @@ export class Safari12 extends HandlerInterface
 		this._remoteSdp!.updateIceParameters(iceParameters);
 
 		if (!this._transportReady)
-			return;
+		{ return; }
 
 		if (this._direction === 'send')
 		{
@@ -295,7 +295,7 @@ export class Safari12 extends HandlerInterface
 		let offerMediaObject;
 
 		if (!this._transportReady)
-			await this._setupTransport({ localDtlsRole: 'server', localSdpObject });
+		{ await this._setupTransport({ localDtlsRole: 'server', localSdpObject }); }
 
 		if (encodings && encodings.length > 1)
 		{
@@ -342,7 +342,7 @@ export class Safari12 extends HandlerInterface
 			for (let idx = 0; idx < sendingRtpParameters.encodings.length; ++idx)
 			{
 				if (encodings[idx])
-					Object.assign(sendingRtpParameters.encodings[idx], encodings[idx]);
+				{ Object.assign(sendingRtpParameters.encodings[idx], encodings[idx]); }
 			}
 		}
 
@@ -398,7 +398,7 @@ export class Safari12 extends HandlerInterface
 		const transceiver = this._mapMidTransceiver.get(localId);
 
 		if (!transceiver)
-			throw new Error('associated RTCRtpTransceiver not found');
+		{ throw new Error('associated RTCRtpTransceiver not found'); }
 
 		transceiver.sender.replaceTrack(null);
 		this._pc.removeTrack(transceiver.sender);
@@ -440,7 +440,7 @@ export class Safari12 extends HandlerInterface
 		const transceiver = this._mapMidTransceiver.get(localId);
 
 		if (!transceiver)
-			throw new Error('associated RTCRtpTransceiver not found');
+		{ throw new Error('associated RTCRtpTransceiver not found'); }
 
 		await transceiver.sender.replaceTrack(track);
 	}
@@ -456,16 +456,16 @@ export class Safari12 extends HandlerInterface
 		const transceiver = this._mapMidTransceiver.get(localId);
 
 		if (!transceiver)
-			throw new Error('associated RTCRtpTransceiver not found');
+		{ throw new Error('associated RTCRtpTransceiver not found'); }
 
 		const parameters = transceiver.sender.getParameters();
 
 		parameters.encodings.forEach((encoding: RTCRtpEncodingParameters, idx: number) =>
 		{
 			if (idx <= spatialLayer)
-				encoding.active = true;
+			{ encoding.active = true; }
 			else
-				encoding.active = false;
+			{ encoding.active = false; }
 		});
 
 		await transceiver.sender.setParameters(parameters);
@@ -482,7 +482,7 @@ export class Safari12 extends HandlerInterface
 		const transceiver = this._mapMidTransceiver.get(localId);
 
 		if (!transceiver)
-			throw new Error('associated RTCRtpTransceiver not found');
+		{ throw new Error('associated RTCRtpTransceiver not found'); }
 
 		const parameters = transceiver.sender.getParameters();
 
@@ -501,7 +501,7 @@ export class Safari12 extends HandlerInterface
 		const transceiver = this._mapMidTransceiver.get(localId);
 
 		if (!transceiver)
-			throw new Error('associated RTCRtpTransceiver not found');
+		{ throw new Error('associated RTCRtpTransceiver not found'); }
 
 		return transceiver.sender.getStats();
 	}
@@ -548,7 +548,7 @@ export class Safari12 extends HandlerInterface
 				.find((m: any) => m.type === 'application');
 
 			if (!this._transportReady)
-				await this._setupTransport({ localDtlsRole: 'server', localSdpObject });
+			{ await this._setupTransport({ localDtlsRole: 'server', localSdpObject }); }
 
 			logger.debug(
 				'sendDataChannel() | calling pc.setLocalDescription() [offer:%o]',
@@ -623,7 +623,7 @@ export class Safari12 extends HandlerInterface
 		answer = { type: 'answer', sdp: sdpTransform.write(localSdpObject) };
 
 		if (!this._transportReady)
-			await this._setupTransport({ localDtlsRole: 'client', localSdpObject });
+		{ await this._setupTransport({ localDtlsRole: 'client', localSdpObject }); }
 
 		logger.debug(
 			'receive() | calling pc.setLocalDescription() [answer:%o]',
@@ -635,7 +635,7 @@ export class Safari12 extends HandlerInterface
 			.find((t: RTCRtpTransceiver) => t.mid === localId);
 
 		if (!transceiver)
-			throw new Error('new RTCRtpTransceiver not found');
+		{ throw new Error('new RTCRtpTransceiver not found'); }
 
 		// Store in the map.
 		this._mapMidTransceiver.set(localId, transceiver);
@@ -656,7 +656,7 @@ export class Safari12 extends HandlerInterface
 		const transceiver = this._mapMidTransceiver.get(localId);
 
 		if (!transceiver)
-			throw new Error('associated RTCRtpTransceiver not found');
+		{ throw new Error('associated RTCRtpTransceiver not found'); }
 
 		this._remoteSdp!.closeMediaSection(transceiver.mid!);
 
@@ -684,7 +684,7 @@ export class Safari12 extends HandlerInterface
 		const transceiver = this._mapMidTransceiver.get(localId);
 
 		if (!transceiver)
-			throw new Error('associated RTCRtpTransceiver not found');
+		{ throw new Error('associated RTCRtpTransceiver not found'); }
 
 		return transceiver.receiver.getStats();
 	}
@@ -763,7 +763,7 @@ export class Safari12 extends HandlerInterface
 	): Promise<void>
 	{
 		if (!localSdpObject)
-			localSdpObject = sdpTransform.parse(this._pc.localDescription.sdp);
+		{ localSdpObject = sdpTransform.parse(this._pc.localDescription.sdp); }
 
 		// Get our local DTLS parameters.
 		const dtlsParameters =

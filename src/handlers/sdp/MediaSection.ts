@@ -63,7 +63,7 @@ export abstract class MediaSection
 				candidateObject.transport = candidate.protocol;
 				candidateObject.type = candidate.type;
 				if (candidate.tcpType)
-					candidateObject.tcptype = candidate.tcpType;
+				{ candidateObject.tcptype = candidate.tcpType; }
 
 				this._mediaObject.candidates.push(candidateObject);
 			}
@@ -201,7 +201,7 @@ export class AnswerMediaSection extends MediaSection
 					};
 
 					if (codec.channels! > 1)
-						rtp.encoding = codec.channels;
+					{ rtp.encoding = codec.channels; }
 
 					this._mediaObject.rtp.push(rtp);
 
@@ -273,13 +273,13 @@ export class AnswerMediaSection extends MediaSection
 							case 'video/h265':
 							{
 								if (videoGoogleStartBitrate !== undefined)
-									codecParameters['x-google-start-bitrate'] = videoGoogleStartBitrate;
+								{ codecParameters['x-google-start-bitrate'] = videoGoogleStartBitrate; }
 
 								if (videoGoogleMaxBitrate !== undefined)
-									codecParameters['x-google-max-bitrate'] = videoGoogleMaxBitrate;
+								{ codecParameters['x-google-max-bitrate'] = videoGoogleMaxBitrate; }
 
 								if (videoGoogleMinBitrate !== undefined)
-									codecParameters['x-google-min-bitrate'] = videoGoogleMinBitrate;
+								{ codecParameters['x-google-min-bitrate'] = videoGoogleMinBitrate; }
 
 								break;
 							}
@@ -295,13 +295,13 @@ export class AnswerMediaSection extends MediaSection
 					for (const key of Object.keys(codecParameters))
 					{
 						if (fmtp.config)
-							fmtp.config += ';';
+						{ fmtp.config += ';'; }
 
 						fmtp.config += `${key}=${codecParameters[key]}`;
 					}
 
 					if (fmtp.config)
-						this._mediaObject.fmtp.push(fmtp);
+					{ this._mediaObject.fmtp.push(fmtp); }
 
 					for (const fb of codec.rtcpFeedback!)
 					{
@@ -327,7 +327,7 @@ export class AnswerMediaSection extends MediaSection
 						.some((localExt: RtpHeaderExtensionParameters) => localExt.uri === ext.uri);
 
 					if (!found)
-						continue;
+					{ continue; }
 
 					this._mediaObject.ext.push(
 						{
@@ -359,7 +359,7 @@ export class AnswerMediaSection extends MediaSection
 					for (const rid of offerMediaObject.rids || [])
 					{
 						if (rid.direction !== 'send')
-							continue;
+						{ continue; }
 
 						this._mediaObject.rids.push(
 							{
@@ -382,7 +382,7 @@ export class AnswerMediaSection extends MediaSection
 					for (const rid of offerMediaObject.rids || [])
 					{
 						if (rid.direction !== 'send')
-							continue;
+						{ continue; }
 
 						this._mediaObject.rids.push(
 							{
@@ -396,7 +396,7 @@ export class AnswerMediaSection extends MediaSection
 				this._mediaObject.rtcpRsize = 'rtcp-rsize';
 
 				if (this._planB && this._mediaObject.type === 'video')
-					this._mediaObject.xGoogleFlag = 'conference';
+				{ this._mediaObject.xGoogleFlag = 'conference'; }
 
 				break;
 			}
@@ -487,9 +487,9 @@ export class OfferMediaSection extends MediaSection
 			this._mediaObject.connection = { ip: '127.0.0.1', version: 4 };
 
 			if (!sctpParameters)
-				this._mediaObject.protocol = 'UDP/TLS/RTP/SAVPF';
+			{ this._mediaObject.protocol = 'UDP/TLS/RTP/SAVPF'; }
 			else
-				this._mediaObject.protocol = 'UDP/DTLS/SCTP';
+			{ this._mediaObject.protocol = 'UDP/DTLS/SCTP'; }
 
 			this._mediaObject.port = 7;
 		}
@@ -515,7 +515,7 @@ export class OfferMediaSection extends MediaSection
 				this._mediaObject.fmtp = [];
 
 				if (!this._planB)
-					this._mediaObject.msid = `${streamId || '-'} ${trackId}`;
+				{ this._mediaObject.msid = `${streamId || '-'} ${trackId}`; }
 
 				for (const codec of offerRtpParameters!.codecs)
 				{
@@ -527,7 +527,7 @@ export class OfferMediaSection extends MediaSection
 					};
 
 					if (codec.channels! > 1)
-						rtp.encoding = codec.channels;
+					{ rtp.encoding = codec.channels; }
 
 					this._mediaObject.rtp.push(rtp);
 
@@ -540,13 +540,13 @@ export class OfferMediaSection extends MediaSection
 					for (const key of Object.keys(codec.parameters))
 					{
 						if (fmtp.config)
-							fmtp.config += ';';
+						{ fmtp.config += ';'; }
 
 						fmtp.config += `${key}=${codec.parameters[key]}`;
 					}
 
 					if (fmtp.config)
-						this._mediaObject.fmtp.push(fmtp);
+					{ this._mediaObject.fmtp.push(fmtp); }
 
 					for (const fb of codec.rtcpFeedback!)
 					{
@@ -763,7 +763,7 @@ function getCodecName(codec: RtpCodecParameters): string
 	const mimeTypeMatch = MimeTypeRegex.exec(codec.mimeType);
 
 	if (!mimeTypeMatch)
-		throw new TypeError('invalid codec.mimeType');
+	{ throw new TypeError('invalid codec.mimeType'); }
 
 	return mimeTypeMatch[2];
 }

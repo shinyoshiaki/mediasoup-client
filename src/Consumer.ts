@@ -11,7 +11,7 @@ export type ConsumerOptions =
 	kind?: 'audio' | 'video';
 	rtpParameters: RtpParameters;
 	appData?: any;
-}
+};
 
 const logger = new Logger('Consumer');
 
@@ -189,7 +189,7 @@ export class Consumer extends EnhancedEventEmitter
 	close(): void
 	{
 		if (this._closed)
-			return;
+		{ return; }
 
 		logger.debug('close()');
 
@@ -209,7 +209,7 @@ export class Consumer extends EnhancedEventEmitter
 	transportClosed(): void
 	{
 		if (this._closed)
-			return;
+		{ return; }
 
 		logger.debug('transportClosed()');
 
@@ -229,7 +229,7 @@ export class Consumer extends EnhancedEventEmitter
 	async getStats(): Promise<RTCStatsReport>
 	{
 		if (this._closed)
-			throw new InvalidStateError('closed');
+		{ throw new InvalidStateError('closed'); }
 
 		return this.safeEmitAsPromise('@getstats');
 	}

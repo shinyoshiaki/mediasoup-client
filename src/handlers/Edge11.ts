@@ -167,7 +167,7 @@ export class Edge11 extends HandlerInterface
 		this._remoteIceParameters = iceParameters;
 
 		if (!this._transportReady)
-			return;
+		{ return; }
 
 		logger.debug('restartIce() | calling iceTransport.start()');
 
@@ -195,7 +195,7 @@ export class Edge11 extends HandlerInterface
 		logger.debug('send() [kind:%s, track.id:%s]', track.kind, track.id);
 
 		if (!this._transportReady)
-			await this._setupTransport({ localDtlsRole: 'server' });
+		{ await this._setupTransport({ localDtlsRole: 'server' }); }
 
 		logger.debug('send() | calling new RTCRtpSender()');
 
@@ -209,14 +209,14 @@ export class Edge11 extends HandlerInterface
 			.some((_codec: any) => /.+\/rtx$/i.test(_codec.mimeType));
 
 		if (!encodings)
-			encodings = [ {} ];
+		{ encodings = [ {} ]; }
 
 		for (const encoding of encodings)
 		{
 			encoding.ssrc = utils.generateRandomNumber();
 
 			if (useRtx)
-				encoding.rtx = { ssrc: utils.generateRandomNumber() };
+			{ encoding.rtx = { ssrc: utils.generateRandomNumber() }; }
 		}
 
 		rtpParameters.encodings = encodings;
@@ -256,7 +256,7 @@ export class Edge11 extends HandlerInterface
 		const rtpSender = this._rtpSenders.get(localId);
 
 		if (!rtpSender)
-			throw new Error('RTCRtpSender not found');
+		{ throw new Error('RTCRtpSender not found'); }
 
 		this._rtpSenders.delete(localId);
 
@@ -291,7 +291,7 @@ export class Edge11 extends HandlerInterface
 		const rtpSender = this._rtpSenders.get(localId);
 
 		if (!rtpSender)
-			throw new Error('RTCRtpSender not found');
+		{ throw new Error('RTCRtpSender not found'); }
 
 		(rtpSender as any).setTrack(track);
 	}
@@ -305,7 +305,7 @@ export class Edge11 extends HandlerInterface
 		const rtpSender = this._rtpSenders.get(localId);
 
 		if (!rtpSender)
-			throw new Error('RTCRtpSender not found');
+		{ throw new Error('RTCRtpSender not found'); }
 
 		const parameters = rtpSender.getParameters();
 
@@ -313,9 +313,9 @@ export class Edge11 extends HandlerInterface
 			.forEach((encoding, idx) =>
 			{
 				if (idx <= spatialLayer)
-					encoding.active = true;
+				{ encoding.active = true; }
 				else
-					encoding.active = false;
+				{ encoding.active = false; }
 			});
 
 		await rtpSender.setParameters(parameters);
@@ -330,7 +330,7 @@ export class Edge11 extends HandlerInterface
 		const rtpSender = this._rtpSenders.get(localId);
 
 		if (!rtpSender)
-			throw new Error('RTCRtpSender not found');
+		{ throw new Error('RTCRtpSender not found'); }
 
 		const parameters = rtpSender.getParameters();
 
@@ -347,7 +347,7 @@ export class Edge11 extends HandlerInterface
 		const rtpSender = this._rtpSenders.get(localId);
 
 		if (!rtpSender)
-			throw new Error('RTCRtpSender not found');
+		{ throw new Error('RTCRtpSender not found'); }
 
 		return rtpSender.getStats();
 	}
@@ -367,7 +367,7 @@ export class Edge11 extends HandlerInterface
 		logger.debug('receive() [trackId:%s, kind:%s]', trackId, kind);
 
 		if (!this._transportReady)
-			await this._setupTransport({ localDtlsRole: 'server' });
+		{ await this._setupTransport({ localDtlsRole: 'server' }); }
 
 		logger.debug('receive() | calling new RTCRtpReceiver()');
 
@@ -408,7 +408,7 @@ export class Edge11 extends HandlerInterface
 		const rtpReceiver = this._rtpReceivers.get(localId);
 
 		if (!rtpReceiver)
-			throw new Error('RTCRtpReceiver not found');
+		{ throw new Error('RTCRtpReceiver not found'); }
 
 		this._rtpReceivers.delete(localId);
 
@@ -429,7 +429,7 @@ export class Edge11 extends HandlerInterface
 		const rtpReceiver = this._rtpReceivers.get(localId);
 
 		if (!rtpReceiver)
-			throw new Error('RTCRtpReceiver not found');
+		{ throw new Error('RTCRtpReceiver not found'); }
 
 		return rtpReceiver.getStats();
 	}
@@ -447,7 +447,7 @@ export class Edge11 extends HandlerInterface
 		{ iceServers?: any[]; iceTransportPolicy?: RTCIceTransportPolicy }
 	): void
 	{
-		//@ts-ignore
+		// @ts-ignore
 		const iceGatherer = new (RTCIceGatherer as any)(
 			{
 				iceServers   : iceServers || [],
@@ -552,7 +552,7 @@ export class Edge11 extends HandlerInterface
 				'dtlsTransport "dtlsstatechange" event [state:%s]', dtlsTransport.state);
 
 			if (dtlsTransport.state === 'closed')
-				this.emit('@connectionstatechange', 'closed');
+			{ this.emit('@connectionstatechange', 'closed'); }
 		});
 
 		dtlsTransport.addEventListener('error', (event: any) =>

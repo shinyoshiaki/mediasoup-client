@@ -34,7 +34,7 @@ export type BuiltinHandlerName =
 	| 'Safari11'
 	| 'Edge11'
 	| 'ReactNative'
-	| 'werift'
+	| 'werift';
 
 export type DeviceOptions =
 {
@@ -224,10 +224,12 @@ export class Device
 				'constructor() | Handler option is DEPRECATED, use handlerName or handlerFactory instead');
 
 			if (typeof Handler === 'string')
-				handlerName = Handler as BuiltinHandlerName;
+			{ handlerName = Handler as BuiltinHandlerName; }
 			else
+			{
 				throw new TypeError(
-					'non string Handler option no longer supported, use handlerFactory instead');
+					'non string Handler option no longer supported, use handlerFactory instead'); 
+			}
 		}
 
 		if (handlerName && handlerFactory)
@@ -251,9 +253,9 @@ export class Device
 				handlerName = detectDevice();
 
 				if (handlerName)
-					logger.debug('constructor() | detected handler: %s', handlerName);
+				{ logger.debug('constructor() | detected handler: %s', handlerName); }
 				else
-					throw new UnsupportedError('device not supported');
+				{ throw new UnsupportedError('device not supported'); }
 			}
 
 			switch (handlerName)
@@ -334,7 +336,7 @@ export class Device
 	get rtpCapabilities(): RtpCapabilities
 	{
 		if (!this._loaded)
-			throw new InvalidStateError('not loaded');
+		{ throw new InvalidStateError('not loaded'); }
 
 		return this._recvRtpCapabilities!;
 	}
@@ -347,7 +349,7 @@ export class Device
 	get sctpCapabilities(): SctpCapabilities
 	{
 		if (!this._loaded)
-			throw new InvalidStateError('not loaded');
+		{ throw new InvalidStateError('not loaded'); }
 
 		return this._sctpCapabilities!;
 	}
@@ -380,7 +382,7 @@ export class Device
 		try
 		{
 			if (this._loaded)
-				throw new InvalidStateError('already loaded');
+			{ throw new InvalidStateError('already loaded'); }
 
 			// This may throw.
 			ortc.validateRtpCapabilities(routerRtpCapabilities);
@@ -438,7 +440,7 @@ export class Device
 		catch (error)
 		{
 			if (handler)
-				handler.close();
+			{ handler.close(); }
 
 			throw error;
 		}
@@ -453,9 +455,9 @@ export class Device
 	canProduce(kind: MediaKind): boolean
 	{
 		if (!this._loaded)
-			throw new InvalidStateError('not loaded');
+		{ throw new InvalidStateError('not loaded'); }
 		else if (kind !== 'audio' && kind !== 'video')
-			throw new TypeError(`invalid kind "${kind}"`);
+		{ throw new TypeError(`invalid kind "${kind}"`); }
 
 		return this._canProduceByKind[kind];
 	}
@@ -555,19 +557,19 @@ export class Device
 	): Transport
 	{
 		if (!this._loaded)
-			throw new InvalidStateError('not loaded');
+		{ throw new InvalidStateError('not loaded'); }
 		else if (typeof id !== 'string')
-			throw new TypeError('missing id');
+		{ throw new TypeError('missing id'); }
 		else if (typeof iceParameters !== 'object')
-			throw new TypeError('missing iceParameters');
+		{ throw new TypeError('missing iceParameters'); }
 		else if (!Array.isArray(iceCandidates))
-			throw new TypeError('missing iceCandidates');
+		{ throw new TypeError('missing iceCandidates'); }
 		else if (typeof dtlsParameters !== 'object')
-			throw new TypeError('missing dtlsParameters');
+		{ throw new TypeError('missing dtlsParameters'); }
 		else if (sctpParameters && typeof sctpParameters !== 'object')
-			throw new TypeError('wrong sctpParameters');
+		{ throw new TypeError('wrong sctpParameters'); }
 		else if (appData && typeof appData !== 'object')
-			throw new TypeError('if given, appData must be an object');
+		{ throw new TypeError('if given, appData must be an object'); }
 
 		// Create a new Transport.
 		const transport = new Transport(

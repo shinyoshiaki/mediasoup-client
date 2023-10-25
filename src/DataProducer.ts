@@ -8,11 +8,11 @@ export type DataProducerOptions =
 	ordered?: boolean;
 	maxPacketLifeTime?: number;
 	maxRetransmits?: number;
-	priority?: "high" | "low" | "medium" | "very-low";
+	priority?: 'high' | 'low' | 'medium' | 'very-low';
 	label?: string;
 	protocol?: string;
 	appData?: any;
-}
+};
 
 const logger = new Logger('DataProducer');
 
@@ -170,7 +170,7 @@ export class DataProducer extends EnhancedEventEmitter
 	close(): void
 	{
 		if (this._closed)
-			return;
+		{ return; }
 
 		logger.debug('close()');
 
@@ -190,7 +190,7 @@ export class DataProducer extends EnhancedEventEmitter
 	transportClosed(): void
 	{
 		if (this._closed)
-			return;
+		{ return; }
 
 		logger.debug('transportClosed()');
 
@@ -214,7 +214,7 @@ export class DataProducer extends EnhancedEventEmitter
 		logger.debug('send()');
 
 		if (this._closed)
-			throw new InvalidStateError('closed');
+		{ throw new InvalidStateError('closed'); }
 
 		this._dataChannel.send(data);
 	}
@@ -224,7 +224,7 @@ export class DataProducer extends EnhancedEventEmitter
 		this._dataChannel.addEventListener('open', () =>
 		{
 			if (this._closed)
-				return;
+			{ return; }
 
 			logger.debug('DataChannel "open" event');
 
@@ -234,12 +234,12 @@ export class DataProducer extends EnhancedEventEmitter
 		this._dataChannel.addEventListener('error', (event: any) =>
 		{
 			if (this._closed)
-				return;
+			{ return; }
 
 			let { error } = event;
 
 			if (!error)
-				error = new Error('unknown DataChannel error');
+			{ error = new Error('unknown DataChannel error'); }
 
 			if (error.errorDetail === 'sctp-failure')
 			{
@@ -258,7 +258,7 @@ export class DataProducer extends EnhancedEventEmitter
 		this._dataChannel.addEventListener('close', () =>
 		{
 			if (this._closed)
-				return;
+			{ return; }
 
 			logger.warn('DataChannel "close" event');
 
@@ -271,7 +271,7 @@ export class DataProducer extends EnhancedEventEmitter
 		this._dataChannel.addEventListener('message', () =>
 		{
 			if (this._closed)
-				return;
+			{ return; }
 
 			logger.warn(
 				'DataChannel "message" event in a DataProducer, message discarded');
@@ -280,7 +280,7 @@ export class DataProducer extends EnhancedEventEmitter
 		this._dataChannel.addEventListener('bufferedamountlow', () =>
 		{
 			if (this._closed)
-				return;
+			{ return; }
 
 			this.safeEmit('bufferedamountlow');
 		});

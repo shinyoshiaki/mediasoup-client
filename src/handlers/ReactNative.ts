@@ -236,7 +236,7 @@ export class ReactNative extends HandlerInterface
 		this._remoteSdp!.updateIceParameters(iceParameters);
 
 		if (!this._transportReady)
-			return;
+		{ return; }
 
 		if (this._direction === 'send')
 		{
@@ -315,7 +315,7 @@ export class ReactNative extends HandlerInterface
 			ortc.reduceCodecs(sendingRemoteRtpParameters.codecs);
 
 		if (!this._transportReady)
-			await this._setupTransport({ localDtlsRole: 'server', localSdpObject });
+		{ await this._setupTransport({ localDtlsRole: 'server', localSdpObject }); }
 
 		if (track.kind === 'video' && encodings && encodings.length > 1)
 		{
@@ -359,7 +359,7 @@ export class ReactNative extends HandlerInterface
 			for (let idx = 0; idx < sendingRtpParameters.encodings.length; ++idx)
 			{
 				if (encodings[idx])
-					Object.assign(sendingRtpParameters.encodings[idx], encodings[idx]);
+				{ Object.assign(sendingRtpParameters.encodings[idx], encodings[idx]); }
 			}
 		}
 
@@ -417,7 +417,7 @@ export class ReactNative extends HandlerInterface
 		const track = this._mapSendLocalIdTrack.get(localId);
 
 		if (!track)
-			throw new Error('track not found');
+		{ throw new Error('track not found'); }
 
 		this._mapSendLocalIdTrack.delete(localId);
 		this._sendStream.removeTrack(track);
@@ -450,7 +450,7 @@ export class ReactNative extends HandlerInterface
 		}
 
 		if (this._pc.signalingState === 'stable')
-			return;
+		{ return; }
 
 		const answer = { type: 'answer', sdp: this._remoteSdp!.getSdp() };
 
@@ -530,7 +530,7 @@ export class ReactNative extends HandlerInterface
 				.find((m: any) => m.type === 'application');
 
 			if (!this._transportReady)
-				await this._setupTransport({ localDtlsRole: 'server', localSdpObject });
+			{ await this._setupTransport({ localDtlsRole: 'server', localSdpObject }); }
 
 			logger.debug(
 				'sendDataChannel() | calling pc.setLocalDescription() [offer:%o]',
@@ -616,7 +616,7 @@ export class ReactNative extends HandlerInterface
 		answer = { type: 'answer', sdp: sdpTransform.write(localSdpObject) };
 
 		if (!this._transportReady)
-			await this._setupTransport({ localDtlsRole: 'client', localSdpObject });
+		{ await this._setupTransport({ localDtlsRole: 'client', localSdpObject }); }
 
 		logger.debug(
 			'receive() | calling pc.setLocalDescription() [answer:%o]',
@@ -629,7 +629,7 @@ export class ReactNative extends HandlerInterface
 		const track = stream.getTrackById(localId);
 
 		if (!track)
-			throw new Error('remote track not found');
+		{ throw new Error('remote track not found'); }
 
 		// Insert into the map.
 		this._mapRecvLocalIdInfo.set(localId, { mid, rtpParameters });
@@ -749,7 +749,7 @@ export class ReactNative extends HandlerInterface
 	): Promise<void>
 	{
 		if (!localSdpObject)
-			localSdpObject = sdpTransform.parse(this._pc.localDescription.sdp);
+		{ localSdpObject = sdpTransform.parse(this._pc.localDescription.sdp); }
 
 		// Get our local DTLS parameters.
 		const dtlsParameters =

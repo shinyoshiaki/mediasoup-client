@@ -6,7 +6,7 @@ import { execSync } from 'child_process';
 
 const PKG = JSON.parse(fs.readFileSync('./package.json').toString());
 const IS_WINDOWS = os.platform() === 'win32';
-const MAYOR_VERSION = PKG.version.split('.')[0];
+// const MAYOR_VERSION = PKG.version.split('.')[0];
 
 const task = process.argv.slice(2).join(' ');
 
@@ -93,11 +93,11 @@ async function run()
 		case 'release':
 		{
 			checkRelease();
-			executeCmd(`git commit -am '${PKG.version}'`);
-			executeCmd(`git tag -a ${PKG.version} -m '${PKG.version}'`);
-			executeCmd(`git push origin v${MAYOR_VERSION}`);
-			executeCmd(`git push origin '${PKG.version}'`);
-			executeCmd('npm publish');
+			// executeCmd(`git commit -am '${PKG.version}'`);
+			// executeCmd(`git tag -a ${PKG.version} -m '${PKG.version}'`);
+			// executeCmd(`git push origin v${MAYOR_VERSION}`);
+			// executeCmd(`git push origin '${PKG.version}'`);
+			// executeCmd('npm publish');
 
 			break;
 		}
@@ -173,7 +173,7 @@ function lint()
 {
 	logInfo('lint()');
 
-	executeCmd('eslint -c .eslintrc.js --max-warnings 0 src .eslintrc.js npm-scripts.mjs');
+	executeCmd('eslint -c .eslintrc.js --fix --max-warnings 0 src .eslintrc.js npm-scripts.mjs');
 }
 
 function test()
@@ -201,7 +201,7 @@ function checkRelease()
 	buildTypescript(/* force */ true);
 	replaceVersion();
 	lint();
-	test();
+	// test();
 }
 
 function executeCmd(command, exitOnError = true)

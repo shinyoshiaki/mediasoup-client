@@ -19,7 +19,7 @@ export type ProducerOptions =
 	disableTrackOnPause?: boolean;
 	zeroRtpOnPause?: boolean;
 	appData?: any;
-}
+};
 
 // https://mediasoup.org/documentation/v3/mediasoup-client/api/#ProducerCodecOptions
 export type ProducerCodecOptions =
@@ -33,7 +33,7 @@ export type ProducerCodecOptions =
 	videoGoogleStartBitrate?: number;
 	videoGoogleMaxBitrate?: number;
 	videoGoogleMinBitrate?: number;
-}
+};
 
 const logger = new Logger('Producer');
 
@@ -235,7 +235,7 @@ export class Producer extends EnhancedEventEmitter
 	close(): void
 	{
 		if (this._closed)
-			return;
+		{ return; }
 
 		logger.debug('close()');
 
@@ -255,7 +255,7 @@ export class Producer extends EnhancedEventEmitter
 	transportClosed(): void
 	{
 		if (this._closed)
-			return;
+		{ return; }
 
 		logger.debug('transportClosed()');
 
@@ -275,7 +275,7 @@ export class Producer extends EnhancedEventEmitter
 	async getStats(): Promise<RTCStatsReport>
 	{
 		if (this._closed)
-			throw new InvalidStateError('closed');
+		{ throw new InvalidStateError('closed'); }
 
 		return this.safeEmitAsPromise('@getstats');
 	}
@@ -390,9 +390,9 @@ export class Producer extends EnhancedEventEmitter
 		if (this._track && this._disableTrackOnPause)
 		{
 			if (!this._paused)
-				this._track.enabled = true;
+			{ this._track.enabled = true; }
 			else if (this._paused)
-				this._track.enabled = false;
+			{ this._track.enabled = false; }
 		}
 
 		// Handle the effective track.
@@ -405,14 +405,14 @@ export class Producer extends EnhancedEventEmitter
 	async setMaxSpatialLayer(spatialLayer: number): Promise<void>
 	{
 		if (this._closed)
-			throw new InvalidStateError('closed');
+		{ throw new InvalidStateError('closed'); }
 		else if (this._kind !== 'video')
-			throw new UnsupportedError('not a video Producer');
+		{ throw new UnsupportedError('not a video Producer'); }
 		else if (typeof spatialLayer !== 'number')
-			throw new TypeError('invalid spatialLayer');
+		{ throw new TypeError('invalid spatialLayer'); }
 
 		if (spatialLayer === this._maxSpatialLayer)
-			return;
+		{ return; }
 
 		await this.safeEmitAsPromise('@setmaxspatiallayer', spatialLayer);
 
@@ -427,9 +427,9 @@ export class Producer extends EnhancedEventEmitter
 	): Promise<void>
 	{
 		if (this._closed)
-			throw new InvalidStateError('closed');
+		{ throw new InvalidStateError('closed'); }
 		else if (typeof params !== 'object')
-			throw new TypeError('invalid params');
+		{ throw new TypeError('invalid params'); }
 
 		await this.safeEmitAsPromise('@setrtpencodingparameters', params);
 	}
@@ -447,7 +447,7 @@ export class Producer extends EnhancedEventEmitter
 	private _handleTrack(): void
 	{
 		if (!this._track)
-			return;
+		{ return; }
 
 		this._track.addEventListener('ended', this._onTrackEnded);
 	}
@@ -455,7 +455,7 @@ export class Producer extends EnhancedEventEmitter
 	private _destroyTrack(): void
 	{
 		if (!this._track)
-			return;
+		{ return; }
 
 		try
 		{
@@ -463,7 +463,7 @@ export class Producer extends EnhancedEventEmitter
 
 			// Just stop the track unless the app set stopTracks: false.
 			if (this._stopTracks)
-				this._track.stop();
+			{ this._track.stop(); }
 		}
 		catch (error)
 		{}

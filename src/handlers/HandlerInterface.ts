@@ -76,12 +76,12 @@ export type HandlerReceiveDataChannelOptions =
 	sctpStreamParameters: SctpStreamParameters;
 	label?: string;
 	protocol?: string;
-}
+};
 
 export type HandlerReceiveDataChannelResult =
 {
 	dataChannel: RTCDataChannel;
-}
+};
 
 export abstract class HandlerInterface extends EnhancedEventEmitter
 {

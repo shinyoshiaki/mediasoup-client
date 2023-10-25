@@ -1,6 +1,6 @@
 {
   "name": "msc-node",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "mediasoup client side Node.js library",
   "keywords": [
     "webrtc",
@@ -31,7 +31,7 @@
     "install-deps": "node npm-scripts.mjs install-deps",
     "lint": "node npm-scripts.mjs lint",
     "prepare": "node npm-scripts.mjs prepare",
-    "release": "node npm-scripts.mjs release",
+    "release": "node npm-scripts.mjs release && npm publish",
     "release:check": "node npm-scripts.mjs release:check",
     "server": "cd example/server && DEBUG=* npm run dev",
     "test": "node npm-scripts.mjs test",

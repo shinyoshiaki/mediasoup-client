@@ -10,7 +10,7 @@ export type DataConsumerOptions =
 	label?: string;
 	protocol?: string;
 	appData?: any;
-}
+};
 
 const logger = new Logger('DataConsumer');
 
@@ -173,7 +173,7 @@ export class DataConsumer extends EnhancedEventEmitter
 	close(): void
 	{
 		if (this._closed)
-			return;
+		{ return; }
 
 		logger.debug('close()');
 
@@ -193,7 +193,7 @@ export class DataConsumer extends EnhancedEventEmitter
 	transportClosed(): void
 	{
 		if (this._closed)
-			return;
+		{ return; }
 
 		logger.debug('transportClosed()');
 
@@ -212,7 +212,7 @@ export class DataConsumer extends EnhancedEventEmitter
 		this._dataChannel.addEventListener('open', () =>
 		{
 			if (this._closed)
-				return;
+			{ return; }
 
 			logger.debug('DataChannel "open" event');
 
@@ -222,12 +222,12 @@ export class DataConsumer extends EnhancedEventEmitter
 		this._dataChannel.addEventListener('error', (event: any) =>
 		{
 			if (this._closed)
-				return;
+			{ return; }
 
 			let { error } = event;
 
 			if (!error)
-				error = new Error('unknown DataChannel error');
+			{ error = new Error('unknown DataChannel error'); }
 
 			if (error.errorDetail === 'sctp-failure')
 			{
@@ -246,7 +246,7 @@ export class DataConsumer extends EnhancedEventEmitter
 		this._dataChannel.addEventListener('close', () =>
 		{
 			if (this._closed)
-				return;
+			{ return; }
 
 			logger.warn('DataChannel "close" event');
 
@@ -259,7 +259,7 @@ export class DataConsumer extends EnhancedEventEmitter
 		this._dataChannel.addEventListener('message', (event: any) =>
 		{
 			if (this._closed)
-				return;
+			{ return; }
 
 			this.safeEmit('message', event.data);
 		});

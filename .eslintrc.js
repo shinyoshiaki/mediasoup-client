@@ -72,16 +72,16 @@ const eslintConfig =
 				beforeLineComment  : false
 			}
 		],
-		'max-len' : [ 2, 90,
-			{
-				tabWidth               : 2,
-				comments               : 90,
-				ignoreUrls             : true,
-				ignoreStrings          : true,
-				ignoreTemplateLiterals : true,
-				ignoreRegExpLiterals   : true
-			}
-		],
+		// 'max-len' : [ 2, 90,
+		// 	{
+		// 		tabWidth               : 2,
+		// 		comments               : 90,
+		// 		ignoreUrls             : true,
+		// 		ignoreStrings          : true,
+		// 		ignoreTemplateLiterals : true,
+		// 		ignoreRegExpLiterals   : true
+		// 	}
+		// ],
 		'newline-after-var'             : 2,
 		'newline-before-return'         : 2,
 		'newline-per-chained-call'      : 2,

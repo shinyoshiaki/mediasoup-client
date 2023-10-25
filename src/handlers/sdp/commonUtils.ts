@@ -30,7 +30,7 @@ export function extractRtpCapabilities(
 			case 'audio':
 			{
 				if (gotAudio)
-					continue;
+				{ continue; }
 
 				gotAudio = true;
 
@@ -39,7 +39,7 @@ export function extractRtpCapabilities(
 			case 'video':
 			{
 				if (gotVideo)
-					continue;
+				{ continue; }
 
 				gotVideo = true;
 
@@ -75,11 +75,11 @@ export function extractRtpCapabilities(
 			const codec = codecsMap.get(fmtp.payload);
 
 			if (!codec)
-				continue;
+			{ continue; }
 
 			// Specials case to convert parameter value to string.
 			if (parameters && parameters.hasOwnProperty('profile-level-id'))
-				parameters['profile-level-id'] = String(parameters['profile-level-id']);
+			{ parameters['profile-level-id'] = String(parameters['profile-level-id']); }
 
 			codec.parameters = parameters;
 		}
@@ -90,7 +90,7 @@ export function extractRtpCapabilities(
 			const codec = codecsMap.get(fb.payload);
 
 			if (!codec)
-				continue;
+			{ continue; }
 
 			const feedback: RtcpFeedback =
 			{
@@ -99,7 +99,7 @@ export function extractRtpCapabilities(
 			};
 
 			if (!feedback.parameter)
-				delete feedback.parameter;
+			{ delete feedback.parameter; }
 
 			codec.rtcpFeedback!.push(feedback);
 		}
@@ -109,7 +109,7 @@ export function extractRtpCapabilities(
 		{
 			// Ignore encrypted extensions (not yet supported in mediasoup).
 			if (ext['encrypt-uri'])
-				continue;
+			{ continue; }
 
 			const headerExtension: RtpHeaderExtension =
 			{
@@ -142,7 +142,7 @@ export function extractDtlsParameters(
 		));
 
 	if (!mediaObject)
-		throw new Error('no active media section found');
+	{ throw new Error('no active media section found'); }
 
 	const fingerprint = mediaObject.fingerprint || sdpObject.fingerprint;
 	let role: DtlsRole | undefined;
@@ -184,7 +184,7 @@ export function getCname(
 		.find((line: { attribute: string }) => line.attribute === 'cname');
 
 	if (!ssrcCnameLine)
-		return '';
+	{ return ''; }
 
 	return ssrcCnameLine.value;
 }
@@ -210,13 +210,13 @@ export function applyCodecParameters(
 
 		// Avoid parsing codec parameters for unhandled codecs.
 		if (mimeType !== 'audio/opus')
-			continue;
+		{ continue; }
 
 		const rtp = (answerMediaObject.rtp || [])
 			.find((r: { payload: number }) => r.payload === codec.payloadType);
 
 		if (!rtp)
-			continue;
+		{ continue; }
 
 		// Just in case.
 		answerMediaObject.fmtp = answerMediaObject.fmtp || [];
@@ -239,7 +239,7 @@ export function applyCodecParameters(
 				const spropStereo = codec.parameters['sprop-stereo'];
 
 				if (spropStereo !== undefined)
-					parameters.stereo = spropStereo ? 1 : 0;
+				{ parameters.stereo = spropStereo ? 1 : 0; }
 
 				break;
 			}
@@ -251,7 +251,7 @@ export function applyCodecParameters(
 		for (const key of Object.keys(parameters))
 		{
 			if (fmtp.config)
-				fmtp.config += ';';
+			{ fmtp.config += ';'; }
 
 			fmtp.config += `${key}=${parameters[key]}`;
 		}

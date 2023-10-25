@@ -32,14 +32,14 @@ export type TransportOptions =
 	additionalSettings?: any;
 	proprietaryConstraints?: any;
 	appData?: any;
-}
+};
 
 export type CanProduceByKind =
 {
 	audio: boolean;
 	video: boolean;
 	[key: string]: boolean;
-}
+};
 
 export type IceParameters =
 {
@@ -55,7 +55,7 @@ export type IceParameters =
 	 * ICE Lite.
 	 */
 	iceLite?: boolean;
-}
+};
 
 export type IceCandidate =
 {
@@ -88,7 +88,7 @@ export type IceCandidate =
 	 * The type of TCP candidate.
 	 */
 	tcpType: 'active' | 'passive' | 'so';
-}
+};
 
 export type DtlsParameters =
 {
@@ -100,7 +100,7 @@ export type DtlsParameters =
 	 * DTLS fingerprints.
 	 */
 	fingerprints: DtlsFingerprint[];
-}
+};
 
 /**
  * The hash function algorithm (as defined in the "Hash function Textual Names"
@@ -112,7 +112,7 @@ export type DtlsFingerprint =
 {
 	algorithm: string;
 	value: string;
-}
+};
 
 export type DtlsRole = 'auto' | 'client' | 'server';
 
@@ -313,7 +313,7 @@ export class Transport extends EnhancedEventEmitter
 	close(): void
 	{
 		if (this._closed)
-			return;
+		{ return; }
 
 		logger.debug('close()');
 
@@ -365,7 +365,7 @@ export class Transport extends EnhancedEventEmitter
 	async getStats(): Promise<RTCStatsReport>
 	{
 		if (this._closed)
-			throw new InvalidStateError('closed');
+		{ throw new InvalidStateError('closed'); }
 
 		return this._handler.getTransportStats();
 	}
@@ -381,9 +381,9 @@ export class Transport extends EnhancedEventEmitter
 		logger.debug('restartIce()');
 
 		if (this._closed)
-			throw new InvalidStateError('closed');
+		{ throw new InvalidStateError('closed'); }
 		else if (!iceParameters)
-			throw new TypeError('missing iceParameters');
+		{ throw new TypeError('missing iceParameters'); }
 
 		// Enqueue command.
 		return this._awaitQueue.push(
@@ -402,9 +402,9 @@ export class Transport extends EnhancedEventEmitter
 		logger.debug('updateIceServers()');
 
 		if (this._closed)
-			throw new InvalidStateError('closed');
+		{ throw new InvalidStateError('closed'); }
 		else if (!Array.isArray(iceServers))
-			throw new TypeError('missing iceServers');
+		{ throw new TypeError('missing iceServers'); }
 
 		// Enqueue command.
 		return this._awaitQueue.push(
@@ -431,19 +431,19 @@ export class Transport extends EnhancedEventEmitter
 		logger.debug('produce() [track:%o]', track);
 
 		if (!track)
-			throw new TypeError('missing track');
+		{ throw new TypeError('missing track'); }
 		else if (this._direction !== 'send')
-			throw new UnsupportedError('not a sending Transport');
+		{ throw new UnsupportedError('not a sending Transport'); }
 		else if (!this._canProduceByKind[track.kind])
-			throw new UnsupportedError(`cannot produce ${track.kind}`);
+		{ throw new UnsupportedError(`cannot produce ${track.kind}`); }
 		else if (track.readyState === 'ended')
-			throw new InvalidStateError('track ended');
+		{ throw new InvalidStateError('track ended'); }
 		else if (this.listenerCount('connect') === 0 && this._connectionState === 'new')
-			throw new TypeError('no "connect" listener set into this transport');
+		{ throw new TypeError('no "connect" listener set into this transport'); }
 		else if (this.listenerCount('produce') === 0)
-			throw new TypeError('no "produce" listener set into this transport');
+		{ throw new TypeError('no "produce" listener set into this transport'); }
 		else if (appData && typeof appData !== 'object')
-			throw new TypeError('if given, appData must be an object');
+		{ throw new TypeError('if given, appData must be an object'); }
 
 		// Enqueue command.
 		return this._awaitQueue.push(
@@ -467,23 +467,23 @@ export class Transport extends EnhancedEventEmitter
 							const normalizedEncoding: any = { active: true };
 
 							if (encoding.active === false)
-								normalizedEncoding.active = false;
+							{ normalizedEncoding.active = false; }
 							if (typeof encoding.dtx === 'boolean')
-								normalizedEncoding.dtx = encoding.dtx;
+							{ normalizedEncoding.dtx = encoding.dtx; }
 							if (typeof encoding.scalabilityMode === 'string')
-								normalizedEncoding.scalabilityMode = encoding.scalabilityMode;
+							{ normalizedEncoding.scalabilityMode = encoding.scalabilityMode; }
 							if (typeof encoding.scaleResolutionDownBy === 'number')
-								normalizedEncoding.scaleResolutionDownBy = encoding.scaleResolutionDownBy;
+							{ normalizedEncoding.scaleResolutionDownBy = encoding.scaleResolutionDownBy; }
 							if (typeof encoding.maxBitrate === 'number')
-								normalizedEncoding.maxBitrate = encoding.maxBitrate;
+							{ normalizedEncoding.maxBitrate = encoding.maxBitrate; }
 							if (typeof encoding.maxFramerate === 'number')
-								normalizedEncoding.maxFramerate = encoding.maxFramerate;
+							{ normalizedEncoding.maxFramerate = encoding.maxFramerate; }
 							if (typeof encoding.adaptivePtime === 'boolean')
-								normalizedEncoding.adaptivePtime = encoding.adaptivePtime;
+							{ normalizedEncoding.adaptivePtime = encoding.adaptivePtime; }
 							if (typeof encoding.priority === 'string')
-								normalizedEncoding.priority = encoding.priority;
+							{ normalizedEncoding.priority = encoding.priority; }
 							if (typeof encoding.networkPriority === 'string')
-								normalizedEncoding.networkPriority = encoding.networkPriority;
+							{ normalizedEncoding.networkPriority = encoding.networkPriority; }
 
 							return normalizedEncoding;
 						});
@@ -572,19 +572,19 @@ export class Transport extends EnhancedEventEmitter
 		rtpParameters = utils.clone(rtpParameters, undefined);
 
 		if (this._closed)
-			throw new InvalidStateError('closed');
+		{ throw new InvalidStateError('closed'); }
 		else if (this._direction !== 'recv')
-			throw new UnsupportedError('not a receiving Transport');
+		{ throw new UnsupportedError('not a receiving Transport'); }
 		else if (typeof id !== 'string')
-			throw new TypeError('missing id');
+		{ throw new TypeError('missing id'); }
 		else if (typeof producerId !== 'string')
-			throw new TypeError('missing producerId');
+		{ throw new TypeError('missing producerId'); }
 		else if (kind !== 'audio' && kind !== 'video')
-			throw new TypeError(`invalid kind '${kind}'`);
+		{ throw new TypeError(`invalid kind '${kind}'`); }
 		else if (this.listenerCount('connect') === 0 && this._connectionState === 'new')
-			throw new TypeError('no "connect" listener set into this transport');
+		{ throw new TypeError('no "connect" listener set into this transport'); }
 		else if (appData && typeof appData !== 'object')
-			throw new TypeError('if given, appData must be an object');
+		{ throw new TypeError('if given, appData must be an object'); }
 
 		// Enqueue command.
 		return this._awaitQueue.push(
@@ -595,7 +595,7 @@ export class Transport extends EnhancedEventEmitter
 					rtpParameters, this._extendedRtpCapabilities);
 
 				if (!canConsume)
-					throw new UnsupportedError('cannot consume this Producer');
+				{ throw new UnsupportedError('cannot consume this Producer'); }
 
 				const { localId, rtpReceiver, track } =
 					await this._handler.receive({ trackId: id, kind, rtpParameters });
@@ -668,20 +668,20 @@ export class Transport extends EnhancedEventEmitter
 		logger.debug('produceData()');
 
 		if (this._direction !== 'send')
-			throw new UnsupportedError('not a sending Transport');
+		{ throw new UnsupportedError('not a sending Transport'); }
 		else if (!this._maxSctpMessageSize)
-			throw new UnsupportedError('SCTP not enabled by remote Transport');
+		{ throw new UnsupportedError('SCTP not enabled by remote Transport'); }
 		else if (![ 'very-low', 'low', 'medium', 'high' ].includes(priority))
-			throw new TypeError('wrong priority');
+		{ throw new TypeError('wrong priority'); }
 		else if (this.listenerCount('connect') === 0 && this._connectionState === 'new')
-			throw new TypeError('no "connect" listener set into this transport');
+		{ throw new TypeError('no "connect" listener set into this transport'); }
 		else if (this.listenerCount('producedata') === 0)
-			throw new TypeError('no "producedata" listener set into this transport');
+		{ throw new TypeError('no "producedata" listener set into this transport'); }
 		else if (appData && typeof appData !== 'object')
-			throw new TypeError('if given, appData must be an object');
+		{ throw new TypeError('if given, appData must be an object'); }
 
 		if (maxPacketLifeTime || maxRetransmits)
-			ordered = false;
+		{ ordered = false; }
 
 		// Enqueue command.
 		return this._awaitQueue.push(
@@ -745,19 +745,19 @@ export class Transport extends EnhancedEventEmitter
 		sctpStreamParameters = utils.clone(sctpStreamParameters, undefined);
 
 		if (this._closed)
-			throw new InvalidStateError('closed');
+		{ throw new InvalidStateError('closed'); }
 		else if (this._direction !== 'recv')
-			throw new UnsupportedError('not a receiving Transport');
+		{ throw new UnsupportedError('not a receiving Transport'); }
 		else if (!this._maxSctpMessageSize)
-			throw new UnsupportedError('SCTP not enabled by remote Transport');
+		{ throw new UnsupportedError('SCTP not enabled by remote Transport'); }
 		else if (typeof id !== 'string')
-			throw new TypeError('missing id');
+		{ throw new TypeError('missing id'); }
 		else if (typeof dataProducerId !== 'string')
-			throw new TypeError('missing dataProducerId');
+		{ throw new TypeError('missing dataProducerId'); }
 		else if (this.listenerCount('connect') === 0 && this._connectionState === 'new')
-			throw new TypeError('no "connect" listener set into this transport');
+		{ throw new TypeError('no "connect" listener set into this transport'); }
 		else if (appData && typeof appData !== 'object')
-			throw new TypeError('if given, appData must be an object');
+		{ throw new TypeError('if given, appData must be an object'); }
 
 		// This may throw.
 		ortc.validateSctpStreamParameters(sctpStreamParameters);
@@ -818,14 +818,14 @@ export class Transport extends EnhancedEventEmitter
 		handler.on('@connectionstatechange', (connectionState: ConnectionState) =>
 		{
 			if (connectionState === this._connectionState)
-				return;
+			{ return; }
 
 			logger.debug('connection state changed to %s', connectionState);
 
 			this._connectionState = connectionState;
 
 			if (!this._closed)
-				this.safeEmit('connectionstatechange', connectionState);
+			{ this.safeEmit('connectionstatechange', connectionState); }
 		});
 	}
 
@@ -836,7 +836,7 @@ export class Transport extends EnhancedEventEmitter
 			this._producers.delete(producer.id);
 
 			if (this._closed)
-				return;
+			{ return; }
 
 			this._awaitQueue.push(
 				async () => this._handler.stopSending(producer.localId),
@@ -876,7 +876,7 @@ export class Transport extends EnhancedEventEmitter
 		producer.on('@getstats', (callback, errback) =>
 		{
 			if (this._closed)
-				return errback(new InvalidStateError('closed'));
+			{ return errback(new InvalidStateError('closed')); }
 
 			this._handler.getSenderStats(producer.localId)
 				.then(callback)
@@ -891,7 +891,7 @@ export class Transport extends EnhancedEventEmitter
 			this._consumers.delete(consumer.id);
 
 			if (this._closed)
-				return;
+			{ return; }
 
 			this._awaitQueue.push(
 				async () => this._handler.stopReceiving(consumer.localId),
@@ -902,7 +902,7 @@ export class Transport extends EnhancedEventEmitter
 		consumer.on('@getstats', (callback, errback) =>
 		{
 			if (this._closed)
-				return errback(new InvalidStateError('closed'));
+			{ return errback(new InvalidStateError('closed')); }
 
 			this._handler.getReceiverStats(consumer.localId)
 				.then(callback)

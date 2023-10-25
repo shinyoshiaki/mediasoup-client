@@ -47,7 +47,7 @@ describe("media", () => {
 
       client.onProduceMedia.subscribe(async (target) => {
         const track = (await client.consume(target)).track;
-        expect(client.recvTransport.pc.transceivers.length).toBe(2); // mid 0 & mid probator
+        expect(client.recvTransport.pc.getTransceivers().length).toBe(2); // mid 0 & mid probator
         track.onReceiveRtp.subscribe(async () => {
           try {
             udp.close();
@@ -65,7 +65,7 @@ describe("media", () => {
         track.writeRtp(data);
       });
 
-      expect(client.sendTransport.pc.transceivers.length).toBe(1);
+      expect(client.sendTransport.pc.getTransceivers().length).toBe(1);
     }));
 
   test("produce consume unconsume", async () =>
@@ -81,12 +81,12 @@ describe("media", () => {
       client.onProduceMedia.subscribe(async (target) => {
         const consumer = await client.consume(target);
         expect(
-          client.recvTransport.pc.transceivers.map((t) => t.currentDirection)
+          client.recvTransport.pc.getTransceivers().map((t) => t.currentDirection)
         ).toEqual(["recvonly", "recvonly"]);
         await client.unConsume(consumer);
         await new Promise((r) => setTimeout(r, 10));
         expect(
-          client.recvTransport.pc.transceivers.map((t) => t.currentDirection)
+          client.recvTransport.pc.getTransceivers().map((t) => t.currentDirection)
         ).toEqual(["inactive", "recvonly"]);
         socket.close();
         await new Promise((r) => setTimeout(r, waitFor));
@@ -95,7 +95,7 @@ describe("media", () => {
 
       const track = new MediaStreamTrack({ kind: "video" });
       await client.publishMedia(track as any);
-      expect(client.sendTransport.pc.transceivers.length).toBe(1);
+      expect(client.sendTransport.pc.getTransceivers().length).toBe(1);
     }));
 
   test("produce(audio) consume", async () =>
@@ -120,7 +120,7 @@ describe("media", () => {
 
       client.onProduceMedia.subscribe(async (target) => {
         const consumer = await client.consume(target);
-        expect(client.recvTransport.pc.transceivers.length).toBe(1);
+        expect(client.recvTransport.pc.getTransceivers().length).toBe(1);
         consumer.track.onReceiveRtp.subscribe(async (rtp) => {
           expect(rtp.payload.toString()).toBe("audio");
           socket.close();
@@ -131,7 +131,7 @@ describe("media", () => {
 
       const track = new MediaStreamTrack({ kind: "audio" });
       await client.publishMedia(track as any);
-      expect(client.sendTransport.pc.transceivers.length).toBe(1);
+      expect(client.sendTransport.pc.getTransceivers().length).toBe(1);
       const audioRtp = new RtpBuilder();
       setInterval(() => {
         const rtp = audioRtp.create(Buffer.from("audio"));
@@ -160,7 +160,7 @@ describe("media", () => {
       await client.setupProducerTransport();
 
       const counter = new Counter(3, async () => {
-        expect(client.recvTransport.pc.transceivers.length).toBe(2);
+        expect(client.recvTransport.pc.getTransceivers().length).toBe(2);
         socket.close();
         await new Promise((r) => setTimeout(r, waitFor));
         done();
@@ -195,7 +195,7 @@ describe("media", () => {
         }, 1000 / 30);
       }
 
-      expect(client.sendTransport.pc.transceivers.length).toBe(2);
+      expect(client.sendTransport.pc.getTransceivers().length).toBe(2);
       counter.done();
     }));
 
@@ -246,7 +246,7 @@ describe("media", () => {
       await client.setupProducerTransport();
 
       const counter = new Counter(3, async () => {
-        expect(client.recvTransport.pc.transceivers.length).toBe(3);
+        expect(client.recvTransport.pc.getTransceivers().length).toBe(3);
         socket.close();
         try {
           udp.close();
@@ -286,7 +286,7 @@ describe("media", () => {
       }
 
       client;
-      expect(client.sendTransport.pc.transceivers.length).toBe(2);
+      expect(client.sendTransport.pc.getTransceivers().length).toBe(2);
       counter.done();
     }));
 });

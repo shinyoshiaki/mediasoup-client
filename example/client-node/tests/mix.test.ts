@@ -65,7 +65,7 @@ describe("mix", () => {
         await client.setupProducerTransport();
 
         const counter = new Counter(4, async () => {
-          expect(client.recvTransport.pc.transceivers.length).toBe(3);
+          expect(client.recvTransport.pc.getTransceivers().length).toBe(3);
           socket.close();
           try {
             udp.close();
@@ -120,7 +120,7 @@ describe("mix", () => {
           }, 1000 / 30);
         }
 
-        expect(client.sendTransport.pc.transceivers.length).toBe(2);
+        expect(client.sendTransport.pc.getTransceivers().length).toBe(2);
         counter.done();
       }),
     10_000

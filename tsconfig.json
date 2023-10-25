@@ -1,17 +1,17 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "lib": ["DOM", "esnext"],
-    "declaration": true,
-    "outDir": "lib",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "importHelpers": true,
-    "pretty": true,
-    "sourceMap": true,
-    "inlineSources": true,
-    "skipLibCheck": true
-  },
-  "include": ["src"]
+	"compileOnSave": true,
+	"compilerOptions":
+	{
+		"lib": [ "es2020", "dom" ],
+		"target": "es2020",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"isolatedModules": true,
+		"strict": true,
+		"outDir": "lib",
+		"declaration": true,
+		"declarationMap": true
+	},
+	"include": [ "src" ]
 }

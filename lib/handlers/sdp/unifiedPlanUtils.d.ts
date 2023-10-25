@@ -9,3 +9,4 @@ export declare function addLegacySimulcast({ offerMediaObject, numStreams }: {
     offerMediaObject: any;
     numStreams: number;
 }): void;
+//# sourceMappingURL=unifiedPlanUtils.d.ts.map

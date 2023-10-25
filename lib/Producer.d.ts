@@ -1,7 +1,7 @@
 import { EnhancedEventEmitter } from './EnhancedEventEmitter';
 import { RtpCodecCapability, RtpParameters, RtpEncodingParameters } from './RtpParameters';
 import { RTCRtpSender } from 'werift/lib/webrtc/src/media/rtpSender';
-export declare type ProducerOptions = {
+export type ProducerOptions = {
     track?: MediaStreamTrack;
     encodings?: RtpEncodingParameters[];
     codecOptions?: ProducerCodecOptions;
@@ -11,7 +11,7 @@ export declare type ProducerOptions = {
     zeroRtpOnPause?: boolean;
     appData?: any;
 };
-export declare type ProducerCodecOptions = {
+export type ProducerCodecOptions = {
     opusStereo?: boolean;
     opusFec?: boolean;
     opusDtx?: boolean;
@@ -150,3 +150,4 @@ export declare class Producer extends EnhancedEventEmitter {
     private _handleTrack;
     private _destroyTrack;
 }
+//# sourceMappingURL=Producer.d.ts.map

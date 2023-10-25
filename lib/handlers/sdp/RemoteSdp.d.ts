@@ -60,3 +60,4 @@ export declare class RemoteSdp {
     _replaceMediaSection(newMediaSection: MediaSection, reuseMid?: string): void;
     _regenerateBundleMids(): void;
 }
+//# sourceMappingURL=RemoteSdp.d.ts.map

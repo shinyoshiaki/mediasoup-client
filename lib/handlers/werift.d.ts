@@ -9,7 +9,7 @@ export declare class Werift extends HandlerInterface {
             audio: RTCRtpCodecParameters[];
             video: RTCRtpCodecParameters[];
         }>;
-        headerExtensions: Partial<{
+        headerExtensions?: Partial<{
             audio: RTCRtpHeaderExtensionParameters[];
             video: RTCRtpHeaderExtensionParameters[];
         }>;
@@ -28,7 +28,7 @@ export declare class Werift extends HandlerInterface {
             audio: RTCRtpCodecParameters[];
             video: RTCRtpCodecParameters[];
         }>;
-        headerExtensions: Partial<{
+        headerExtensions?: Partial<{
             audio: RTCRtpHeaderExtensionParameters[];
             video: RTCRtpHeaderExtensionParameters[];
         }>;
@@ -38,7 +38,7 @@ export declare class Werift extends HandlerInterface {
             audio: RTCRtpCodecParameters[];
             video: RTCRtpCodecParameters[];
         }>;
-        headerExtensions: Partial<{
+        headerExtensions?: Partial<{
             audio: RTCRtpHeaderExtensionParameters[];
             video: RTCRtpHeaderExtensionParameters[];
         }>;
@@ -66,3 +66,4 @@ export declare class Werift extends HandlerInterface {
     private _assertSendDirection;
     private _assertRecvDirection;
 }
+//# sourceMappingURL=werift.d.ts.map

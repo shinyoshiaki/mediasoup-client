@@ -12,7 +12,7 @@ interface InternalTransportOptions extends TransportOptions {
     extendedRtpCapabilities: any;
     canProduceByKind: CanProduceByKind;
 }
-export declare type TransportOptions = {
+export type TransportOptions = {
     id: string;
     iceParameters: IceParameters;
     iceCandidates: IceCandidate[];
@@ -24,12 +24,12 @@ export declare type TransportOptions = {
     proprietaryConstraints?: any;
     appData?: any;
 };
-export declare type CanProduceByKind = {
+export type CanProduceByKind = {
     audio: boolean;
     video: boolean;
     [key: string]: boolean;
 };
-export declare type IceParameters = {
+export type IceParameters = {
     /**
      * ICE username fragment.
      * */
@@ -43,7 +43,7 @@ export declare type IceParameters = {
      */
     iceLite?: boolean;
 };
-export declare type IceCandidate = {
+export type IceCandidate = {
     /**
      * Unique identifier that allows ICE to correlate candidates that appear on
      * multiple transports.
@@ -74,7 +74,7 @@ export declare type IceCandidate = {
      */
     tcpType: 'active' | 'passive' | 'so';
 };
-export declare type DtlsParameters = {
+export type DtlsParameters = {
     /**
      * DTLS role. Default 'auto'.
      */
@@ -90,13 +90,13 @@ export declare type DtlsParameters = {
  * certificate fingerprint value (in lowercase hex string as expressed utilizing
  * the syntax of "fingerprint" in RFC 4572 Section 5).
  */
-export declare type DtlsFingerprint = {
+export type DtlsFingerprint = {
     algorithm: string;
     value: string;
 };
-export declare type DtlsRole = 'auto' | 'client' | 'server';
-export declare type ConnectionState = 'new' | 'connecting' | 'connected' | 'failed' | 'disconnected' | 'closed';
-export declare type PlainRtpParameters = {
+export type DtlsRole = 'auto' | 'client' | 'server';
+export type ConnectionState = 'new' | 'connecting' | 'connected' | 'failed' | 'disconnected' | 'closed';
+export type PlainRtpParameters = {
     ip: string;
     ipVersion: 4 | 6;
     port: number;
@@ -209,3 +209,4 @@ export declare class Transport extends EnhancedEventEmitter {
     _handleDataConsumer(dataConsumer: DataConsumer): void;
 }
 export {};
+//# sourceMappingURL=Transport.d.ts.map

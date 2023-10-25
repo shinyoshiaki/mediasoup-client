@@ -1,6 +1,6 @@
 import { EnhancedEventEmitter } from './EnhancedEventEmitter';
 import { SctpStreamParameters } from './SctpParameters';
-export declare type DataConsumerOptions = {
+export type DataConsumerOptions = {
     id?: string;
     dataProducerId?: string;
     sctpStreamParameters: SctpStreamParameters;
@@ -91,3 +91,4 @@ export declare class DataConsumer extends EnhancedEventEmitter {
     transportClosed(): void;
     private _handleDataChannel;
 }
+//# sourceMappingURL=DataConsumer.d.ts.map

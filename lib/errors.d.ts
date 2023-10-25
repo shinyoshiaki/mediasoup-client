@@ -10,3 +10,4 @@ export declare class UnsupportedError extends Error {
 export declare class InvalidStateError extends Error {
     constructor(message: string);
 }
+//# sourceMappingURL=errors.d.ts.map

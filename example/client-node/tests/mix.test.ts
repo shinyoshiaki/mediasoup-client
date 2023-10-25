@@ -22,19 +22,19 @@ describe("mix", () => {
       new Promise<void>(async (done) => {
         const port = await randomPort();
         const child = ffmpeg()
-        .input("testsrc=size=640x480:rate=30")
-        .inputFormat("lavfi")
-        .videoCodec("libvpx")
-        .addOptions([
-          "-cpu-used 5",
-          "-deadline 1",
-          "-g 10",
-          "-error-resilient 1",
-          "-auto-alt-ref 1",
-        ])
-        .toFormat("rtp")
-        .save(`rtp://127.0.0.1:${port}/input.mpg`)
-        .on("error", () => {});
+          .input("testsrc=size=640x480:rate=30")
+          .inputFormat("lavfi")
+          .videoCodec("libvpx")
+          .addOptions([
+            "-cpu-used 5",
+            "-deadline 1",
+            "-g 10",
+            "-error-resilient 1",
+            "-auto-alt-ref 1",
+          ])
+          .toFormat("rtp")
+          .save(`rtp://127.0.0.1:${port}/input.mpg`)
+          .on("error", () => {});
 
         const udp = createSocket("udp4");
         udp.bind(port);
@@ -93,7 +93,7 @@ describe("mix", () => {
             expect(data).toBe("data");
             socket.close();
             await new Promise((r) => setTimeout(r, waitFor));
-            done();
+            counter.done();
           });
         });
 

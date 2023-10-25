@@ -5,3 +5,4 @@ export declare class EnhancedEventEmitter extends EventEmitter {
     safeEmit(event: string, ...args: any[]): boolean;
     safeEmitAsPromise(event: string, ...args: any[]): Promise<any>;
 }
+//# sourceMappingURL=EnhancedEventEmitter.d.ts.map

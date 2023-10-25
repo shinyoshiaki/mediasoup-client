@@ -464,7 +464,7 @@ export class Edge11 extends HandlerInterface
 		{
 			iceGatherer.gather();
 		}
-		catch (error)
+		catch (error:any)
 		{
 			logger.debug(
 				'_setIceGatherer() | iceGatherer.gather() failed: %s', error.toString());

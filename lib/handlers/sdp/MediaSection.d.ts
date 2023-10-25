@@ -60,3 +60,4 @@ export declare class OfferMediaSection extends MediaSection {
         offerRtpParameters: RtpParameters;
     }): void;
 }
+//# sourceMappingURL=MediaSection.d.ts.map

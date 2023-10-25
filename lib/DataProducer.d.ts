@@ -1,6 +1,6 @@
 import { EnhancedEventEmitter } from './EnhancedEventEmitter';
 import { SctpStreamParameters } from './SctpParameters';
-export declare type DataProducerOptions = {
+export type DataProducerOptions = {
     ordered?: boolean;
     maxPacketLifeTime?: number;
     maxRetransmits?: number;
@@ -96,3 +96,4 @@ export declare class DataProducer extends EnhancedEventEmitter {
     send(data: any): void;
     private _handleDataChannel;
 }
+//# sourceMappingURL=DataProducer.d.ts.map

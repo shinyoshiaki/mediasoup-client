@@ -17,3 +17,4 @@ export declare function applyCodecParameters({ offerRtpParameters, answerMediaOb
     offerRtpParameters: RtpParameters;
     answerMediaObject: any;
 }): void;
+//# sourceMappingURL=commonUtils.d.ts.map

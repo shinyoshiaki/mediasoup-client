@@ -4,8 +4,8 @@ import { IceParameters, IceCandidate, DtlsParameters } from '../Transport';
 import { RtpCapabilities, RtpCodecCapability, RtpParameters, RtpEncodingParameters } from '../RtpParameters';
 import { SctpCapabilities, SctpParameters, SctpStreamParameters } from '../SctpParameters';
 import { RTCRtpSender } from 'werift/lib/webrtc/src/media/rtpSender';
-export declare type HandlerFactory = () => HandlerInterface;
-export declare type HandlerRunOptions = {
+export type HandlerFactory = () => HandlerInterface;
+export type HandlerRunOptions = {
     direction: 'send' | 'recv';
     iceParameters: IceParameters;
     iceCandidates: IceCandidate[];
@@ -17,38 +17,38 @@ export declare type HandlerRunOptions = {
     proprietaryConstraints?: any;
     extendedRtpCapabilities: any;
 };
-export declare type HandlerSendOptions = {
+export type HandlerSendOptions = {
     track: MediaStreamTrack;
     encodings?: RtpEncodingParameters[];
     codecOptions?: ProducerCodecOptions;
     codec?: RtpCodecCapability;
 };
-export declare type HandlerSendResult = {
+export type HandlerSendResult = {
     localId: string;
     rtpParameters: RtpParameters;
     rtpSender?: RTCRtpSender;
 };
-export declare type HandlerReceiveOptions = {
+export type HandlerReceiveOptions = {
     trackId: string;
     kind: 'audio' | 'video';
     rtpParameters: RtpParameters;
 };
-export declare type HandlerReceiveResult = {
+export type HandlerReceiveResult = {
     localId: string;
     track: MediaStreamTrack;
     rtpReceiver?: RTCRtpReceiver;
 };
-export declare type HandlerSendDataChannelOptions = SctpStreamParameters;
-export declare type HandlerSendDataChannelResult = {
+export type HandlerSendDataChannelOptions = SctpStreamParameters;
+export type HandlerSendDataChannelResult = {
     dataChannel: RTCDataChannel;
     sctpStreamParameters: SctpStreamParameters;
 };
-export declare type HandlerReceiveDataChannelOptions = {
+export type HandlerReceiveDataChannelOptions = {
     sctpStreamParameters: SctpStreamParameters;
     label?: string;
     protocol?: string;
 };
-export declare type HandlerReceiveDataChannelResult = {
+export type HandlerReceiveDataChannelResult = {
     dataChannel: RTCDataChannel;
 };
 export declare abstract class HandlerInterface extends EnhancedEventEmitter {
@@ -81,3 +81,4 @@ export declare abstract class HandlerInterface extends EnhancedEventEmitter {
     abstract getReceiverStats(localId: string): Promise<RTCStatsReport>;
     abstract receiveDataChannel(options: HandlerReceiveDataChannelOptions): Promise<HandlerReceiveDataChannelResult>;
 }
+//# sourceMappingURL=HandlerInterface.d.ts.map

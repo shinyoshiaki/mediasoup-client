@@ -9,3 +9,4 @@ export * from './SctpParameters';
 export * from './handlers/HandlerInterface';
 export * from './errors';
 export type { ScalabilityMode } from './scalabilityModes';
+//# sourceMappingURL=types.d.ts.map

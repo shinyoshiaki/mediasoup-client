@@ -141,13 +141,13 @@ export class Werift extends HandlerInterface {
     ];
     let preferredId = 1;
     const headerExtensions: RtpHeaderExtension[] = [
-      ...(this.nativeRtpCapabilities.headerExtensions.audio || []).map(
+      ...(this.nativeRtpCapabilities.headerExtensions?.audio ?? []).map(
         ({ uri }) => {
           const ext: RtpHeaderExtension = { uri, preferredId: preferredId++ };
           return ext;
         }
       ),
-      ...(this.nativeRtpCapabilities.headerExtensions.video || []).map(
+      ...(this.nativeRtpCapabilities.headerExtensions?.video ?? []).map(
         ({ uri }) => {
           const ext: RtpHeaderExtension = { uri, preferredId: preferredId++ };
           return ext;

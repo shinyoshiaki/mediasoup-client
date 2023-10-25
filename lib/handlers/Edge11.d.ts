@@ -48,3 +48,4 @@ export declare class Edge11 extends HandlerInterface {
     private _setDtlsTransport;
     private _setupTransport;
 }
+//# sourceMappingURL=Edge11.d.ts.map

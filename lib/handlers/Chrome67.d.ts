@@ -43,3 +43,4 @@ export declare class Chrome67 extends HandlerInterface {
     private _assertSendDirection;
     private _assertRecvDirection;
 }
+//# sourceMappingURL=Chrome67.d.ts.map

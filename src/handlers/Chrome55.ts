@@ -430,7 +430,7 @@ export class Chrome55 extends HandlerInterface
 		{
 			await this._pc.setLocalDescription(offer);
 		}
-		catch (error)
+		catch (error:any)
 		{
 			// NOTE: If there are no sending tracks, setLocalDescription() will fail with
 			// "Failed to create channels". If so, ignore it.

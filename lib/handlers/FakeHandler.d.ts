@@ -2,7 +2,7 @@ import { HandlerInterface, HandlerRunOptions, HandlerSendOptions, HandlerSendRes
 import { IceParameters, DtlsParameters } from '../Transport';
 import { RtpCapabilities } from '../RtpParameters';
 import { SctpCapabilities } from '../SctpParameters';
-export declare type FakeParameters = {
+export type FakeParameters = {
     generateNativeRtpCapabilities: () => RtpCapabilities;
     generateNativeSctpCapabilities: () => SctpCapabilities;
     generateLocalDtlsParameters: () => DtlsParameters;
@@ -42,3 +42,4 @@ export declare class FakeHandler extends HandlerInterface {
     receiveDataChannel({ sctpStreamParameters, label, protocol }: HandlerReceiveDataChannelOptions): Promise<HandlerReceiveDataChannelResult>;
     private _setupTransport;
 }
+//# sourceMappingURL=FakeHandler.d.ts.map

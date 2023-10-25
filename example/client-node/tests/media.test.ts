@@ -14,7 +14,7 @@ import {
   useREMB,
 } from "../../../src";
 import { Counter, waitFor } from "./fixture";
-import { exec } from "child_process";
+
 
 describe("media", () => {
   test("produce-consume", async () =>

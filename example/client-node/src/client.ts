@@ -1,7 +1,4 @@
-import * as mediasoup from "../../../src";
 import {
-  PictureLossIndication,
-  RtcpPayloadSpecificFeedback,
   RTCRtpCodecParameters,
   useAbsSendTime,
   useFIR,
@@ -9,6 +6,7 @@ import {
   usePLI,
   useREMB,
   useSdesMid,
+  Device,
 } from "../../../src";
 import {
   Consumer,
@@ -21,7 +19,7 @@ import { socketPromise } from "./socket.io-promise";
 import Event from "rx.mini";
 
 export class Client {
-  device!: mediasoup.Device;
+  device!: Device;
   onProduceMedia = new Event<[string]>();
   onProduceData = new Event<[string]>();
 
@@ -198,7 +196,7 @@ export class Client {
   }
 
   private loadDevice = async (routerRtpCapabilities: RtpCapabilities) => {
-    this.device = new mediasoup.Device(this.weriftCaps);
+    this.device = new Device(this.weriftCaps);
     await this.device.load({
       routerRtpCapabilities,
     });

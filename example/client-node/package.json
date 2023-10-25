@@ -19,7 +19,8 @@
     "fluent-ffmpeg": "^2.1.2",
     "rx.mini": "^1.1.0",
     "socket.io": "^2.3.0",
-    "socket.io-client": "^2.2.0"
+    "socket.io-client": "^2.2.0",
+    "msc-node": "^0.0.11"
   },
   "devDependencies": {
     "@types/fluent-ffmpeg": "^2.1.23",

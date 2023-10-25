@@ -1,4 +1,4 @@
-import { exec, spawn } from "child_process";
+import ffmpeg from "fluent-ffmpeg";
 import { createSocket } from "dgram";
 import io from "socket.io-client";
 import { Client } from "../src/client";
@@ -12,6 +12,7 @@ import {
   useNACK,
   usePLI,
   useREMB,
+  randomPort,
 } from "../../../src";
 
 describe("mix", () => {
@@ -19,11 +20,24 @@ describe("mix", () => {
     "produce produce(data) produce(audio) consume consume",
     async () =>
       new Promise<void>(async (done) => {
-        const child = exec(
-          "ffmpeg -re -f lavfi -i testsrc=size=640x480:rate=30 -vcodec libvpx -cpu-used 5 -deadline 1 -g 10 -error-resilient 1 -auto-alt-ref 1 -f rtp rtp://127.0.0.1:5030"
-        );
+        const port = await randomPort();
+        const child = ffmpeg()
+        .input("testsrc=size=640x480:rate=30")
+        .inputFormat("lavfi")
+        .videoCodec("libvpx")
+        .addOptions([
+          "-cpu-used 5",
+          "-deadline 1",
+          "-g 10",
+          "-error-resilient 1",
+          "-auto-alt-ref 1",
+        ])
+        .toFormat("rtp")
+        .save(`rtp://127.0.0.1:${port}/input.mpg`)
+        .on("error", () => {});
+
         const udp = createSocket("udp4");
-        udp.bind(5030);
+        udp.bind(port);
         const socket = io.connect("http://127.0.0.1:20000");
 
         await socketPromise(socket)("join");
@@ -55,7 +69,7 @@ describe("mix", () => {
           socket.close();
           try {
             udp.close();
-            process.kill(child.pid + 1);
+            child.kill("SIGKILL");
           } catch (error) {}
           await new Promise((r) => setTimeout(r, waitFor));
           done();

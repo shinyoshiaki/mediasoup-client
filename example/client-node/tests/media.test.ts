@@ -1,4 +1,4 @@
-import { exec, spawn } from "child_process";
+import ffmpeg from "fluent-ffmpeg";
 import { createSocket } from "dgram";
 import { Client } from "../src/client";
 import io from "socket.io-client";
@@ -14,15 +14,28 @@ import {
   useREMB,
 } from "../../../src";
 import { Counter, waitFor } from "./fixture";
+import { exec } from "child_process";
 
 describe("media", () => {
-  test("produce consume", async () =>
+  test("produce-consume", async () =>
     new Promise<void>(async (done) => {
       const port = await randomPort();
 
-      const child = exec(
-        `ffmpeg -re -f lavfi -i testsrc=size=640x480:rate=30 -vcodec libvpx -cpu-used 5 -deadline 1 -g 10 -error-resilient 1 -auto-alt-ref 1 -f rtp rtp://127.0.0.1:${port}`
-      );
+      const child = ffmpeg()
+        .input("testsrc=size=640x480:rate=30")
+        .inputFormat("lavfi")
+        .videoCodec("libvpx")
+        .addOptions([
+          "-cpu-used 5",
+          "-deadline 1",
+          "-g 10",
+          "-error-resilient 1",
+          "-auto-alt-ref 1",
+        ])
+        .toFormat("rtp")
+        .save(`rtp://127.0.0.1:${port}/input.mpg`)
+        .on("error", () => {});
+
       const udp = createSocket("udp4");
       udp.bind(port);
       const socket = io.connect("http://127.0.0.1:20000");
@@ -39,7 +52,7 @@ describe("media", () => {
         track.onReceiveRtp.subscribe(async () => {
           try {
             udp.close();
-            process.kill(child.pid + 1);
+            child.kill("SIGKILL");
           } catch (error) {}
           socket.close();
           await new Promise((r) => setTimeout(r, waitFor));
@@ -190,9 +203,21 @@ describe("media", () => {
   test("produce produce(audio) consume consume", async () =>
     new Promise<void>(async (done) => {
       const port = await randomPort();
-      const child = exec(
-        `ffmpeg -re -f lavfi -i testsrc=size=640x480:rate=30 -vcodec libvpx -cpu-used 5 -deadline 1 -g 10 -error-resilient 1 -auto-alt-ref 1 -f rtp rtp://127.0.0.1:${port}`
-      );
+      const child = ffmpeg()
+      .input("testsrc=size=640x480:rate=30")
+      .inputFormat("lavfi")
+      .videoCodec("libvpx")
+      .addOptions([
+        "-cpu-used 5",
+        "-deadline 1",
+        "-g 10",
+        "-error-resilient 1",
+        "-auto-alt-ref 1",
+      ])
+      .toFormat("rtp")
+      .save(`rtp://127.0.0.1:${port}/input.mpg`)
+      .on("error", () => {});
+
       const udp = createSocket("udp4");
       udp.bind(port);
       const socket = io.connect("http://127.0.0.1:20000");
@@ -226,7 +251,7 @@ describe("media", () => {
         socket.close();
         try {
           udp.close();
-          process.kill(child.pid + 1);
+          child.kill("SIGKILL");
         } catch (error) {}
         await new Promise((r) => setTimeout(r, waitFor));
         done();

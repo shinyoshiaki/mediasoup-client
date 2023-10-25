@@ -18,6 +18,8 @@ import {
 import { socketPromise } from "./socket.io-promise";
 import Event from "rx.mini";
 
+export * from '../../../src'
+
 export class Client {
   device!: Device;
   onProduceMedia = new Event<[string]>();

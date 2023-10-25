@@ -1,9 +1,7 @@
 import ffmpeg from "fluent-ffmpeg";
 import { createSocket } from "dgram";
-import { Client } from "../src/client";
-import io from "socket.io-client";
-import { socketPromise } from "../src/socket.io-promise";
 import {
+  Client,
   MediaStreamTrack,
   randomPort,
   RTCRtpCodecParameters,
@@ -12,9 +10,10 @@ import {
   useNACK,
   usePLI,
   useREMB,
-} from "../../../src";
+} from "../src/client";
+import io from "socket.io-client";
+import { socketPromise } from "../src/socket.io-promise";
 import { Counter, waitFor } from "./fixture";
-
 
 describe("media", () => {
   test("produce-consume", async () =>
@@ -204,19 +203,19 @@ describe("media", () => {
     new Promise<void>(async (done) => {
       const port = await randomPort();
       const child = ffmpeg()
-      .input("testsrc=size=640x480:rate=30")
-      .inputFormat("lavfi")
-      .videoCodec("libvpx")
-      .addOptions([
-        "-cpu-used 5",
-        "-deadline 1",
-        "-g 10",
-        "-error-resilient 1",
-        "-auto-alt-ref 1",
-      ])
-      .toFormat("rtp")
-      .save(`rtp://127.0.0.1:${port}/input.mpg`)
-      .on("error", () => {});
+        .input("testsrc=size=640x480:rate=30")
+        .inputFormat("lavfi")
+        .videoCodec("libvpx")
+        .addOptions([
+          "-cpu-used 5",
+          "-deadline 1",
+          "-g 10",
+          "-error-resilient 1",
+          "-auto-alt-ref 1",
+        ])
+        .toFormat("rtp")
+        .save(`rtp://127.0.0.1:${port}/input.mpg`)
+        .on("error", () => {});
 
       const udp = createSocket("udp4");
       udp.bind(port);

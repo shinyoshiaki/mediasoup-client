@@ -1,10 +1,8 @@
 import ffmpeg from "fluent-ffmpeg";
 import { createSocket } from "dgram";
 import io from "socket.io-client";
-import { Client } from "../src/client";
-import { socketPromise } from "../src/socket.io-promise";
-import { Counter, waitFor } from "./fixture";
 import {
+  Client,
   MediaStreamTrack,
   RTCRtpCodecParameters,
   RtpBuilder,
@@ -13,7 +11,9 @@ import {
   usePLI,
   useREMB,
   randomPort,
-} from "../../../src";
+} from "../src/client";
+import { socketPromise } from "../src/socket.io-promise";
+import { Counter, waitFor } from "./fixture";
 
 describe("mix", () => {
   test(

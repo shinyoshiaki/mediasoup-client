@@ -17,6 +17,7 @@ import {
 	SctpStreamParameters
 } from '../SctpParameters';
 import { RTCRtpSender } from 'werift/lib/webrtc/src/media/rtpSender';
+import { MediaStreamTrack } from 'werift';
 
 export type HandlerFactory = () => HandlerInterface;
 

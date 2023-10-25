@@ -436,8 +436,8 @@ export class Transport extends EnhancedEventEmitter
 		{ throw new UnsupportedError('not a sending Transport'); }
 		else if (!this._canProduceByKind[track.kind])
 		{ throw new UnsupportedError(`cannot produce ${track.kind}`); }
-		else if (track.readyState === 'ended')
-		{ throw new InvalidStateError('track ended'); }
+		// else if (track.readyState === 'ended')
+		// { throw new InvalidStateError('track ended'); }
 		else if (this.listenerCount('connect') === 0 && this._connectionState === 'new')
 		{ throw new TypeError('no "connect" listener set into this transport'); }
 		else if (this.listenerCount('produce') === 0)

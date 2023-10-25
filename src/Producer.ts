@@ -8,6 +8,7 @@ import {
 	RtpEncodingParameters
 } from './RtpParameters';
 import { RTCRtpSender } from 'werift/lib/webrtc/src/media/rtpSender';
+import { MediaStreamTrack } from 'werift';
 
 export type ProducerOptions =
 {
@@ -361,10 +362,10 @@ export class Producer extends EnhancedEventEmitter
 
 			throw new InvalidStateError('closed');
 		}
-		else if (track && track.readyState === 'ended')
-		{
-			throw new InvalidStateError('track ended');
-		}
+		// else if (track && track.readyState === 'ended')
+		// {
+		// 	throw new InvalidStateError('track ended');
+		// }
 
 		// Do nothing if this is the same track as the current handled one.
 		if (track === this._track)

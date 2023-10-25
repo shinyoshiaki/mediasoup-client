@@ -64,7 +64,7 @@ export class Werift extends HandlerInterface {
       audio: RTCRtpCodecParameters[];
       video: RTCRtpCodecParameters[];
     }>;
-    headerExtensions: Partial<{
+    headerExtensions?: Partial<{
       audio: RTCRtpHeaderExtensionParameters[];
       video: RTCRtpHeaderExtensionParameters[];
     }>;
@@ -78,13 +78,22 @@ export class Werift extends HandlerInterface {
         audio: RTCRtpCodecParameters[];
         video: RTCRtpCodecParameters[];
       }>;
-      headerExtensions: Partial<{
+      headerExtensions?: Partial<{
         audio: RTCRtpHeaderExtensionParameters[];
         video: RTCRtpHeaderExtensionParameters[];
       }>;
     }
   ) {
     super();
+    if (!this.nativeRtpCapabilities.headerExtensions) {
+      this.nativeRtpCapabilities.headerExtensions = {};
+    }
+    if (!this.nativeRtpCapabilities.headerExtensions?.audio) {
+      this.nativeRtpCapabilities.headerExtensions.audio = [];
+    }
+    if (!this.nativeRtpCapabilities.headerExtensions?.video) {
+      this.nativeRtpCapabilities.headerExtensions.video = [];
+    }
   }
 
   get name() {

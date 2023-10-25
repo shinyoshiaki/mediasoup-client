@@ -64,7 +64,7 @@ export interface WeriftRtpCapabilities
 		audio: RTCRtpCodecParameters[];
 		video: RTCRtpCodecParameters[];
 	}>;
-	headerExtensions: Partial<{
+	headerExtensions?: Partial<{
 		audio: RTCRtpHeaderExtensionParameters[];
 		video: RTCRtpHeaderExtensionParameters[];
 	}>;

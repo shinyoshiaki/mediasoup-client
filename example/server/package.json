@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "mediasoup": "^3.7.2",
+    "mediasoup": "3.10.12",
     "rx.mini": "^1.1.0",
     "socket.io": "^2.3.0"
   },

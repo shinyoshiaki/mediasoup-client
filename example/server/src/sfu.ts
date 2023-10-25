@@ -1,8 +1,9 @@
 import * as mediasoup from "mediasoup";
 import * as http from "http";
 import { Socket } from "socket.io";
-import {
-  WorkerLogLevel,
+import config from "./config";
+import Event from "rx.mini";
+import {  WorkerLogLevel,
   Worker,
   Router,
   WebRtcTransport,
@@ -14,10 +15,7 @@ import {
   DataProducerOptions,
   RtpParameters,
   MediaKind,
-  DtlsParameters,
-} from "mediasoup/lib/types";
-import config from "./config";
-import Event from "rx.mini";
+  DtlsParameters, } from "mediasoup/node/lib/types";
 
 export class SFU {
   worker?: Worker;

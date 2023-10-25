@@ -1,4 +1,4 @@
-import { MediaKind } from "mediasoup/lib/types";
+import { MediaKind } from "mediasoup/node/lib/types";
 
 const config = {
   listenIp: "0.0.0.0",

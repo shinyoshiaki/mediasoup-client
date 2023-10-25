@@ -37,7 +37,7 @@ export type HandlerRunOptions =
 
 export type HandlerSendOptions =
 {
-	track: MediaStreamTrack;
+	track: any;
 	encodings?: RtpEncodingParameters[];
 	codecOptions?: ProducerCodecOptions;
 	codec?: RtpCodecCapability;
@@ -120,7 +120,7 @@ export abstract class HandlerInterface extends EnhancedEventEmitter
 	abstract stopSending(localId: string): Promise<void>;
 
 	abstract replaceTrack(
-		localId: string, track: MediaStreamTrack | null
+		localId: string, track: any | null
 	): Promise<void>;
 
 	abstract setMaxSpatialLayer(

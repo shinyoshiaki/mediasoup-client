@@ -340,7 +340,7 @@ export class FakeHandler extends HandlerInterface
 		logger.debug('receive() [trackId:%s, kind:%s]', trackId, kind);
 
 		const localId = this._nextLocalId++;
-		const track = new FakeMediaStreamTrack({ kind });
+		const track = new FakeMediaStreamTrack({ kind }) as any;
 
 		this._tracks.set(localId, track);
 

@@ -16,7 +16,7 @@ import { socketPromise } from "../src/socket.io-promise";
 import { Counter, waitFor } from "./fixture";
 
 describe("media", () => {
-  test("produce-consume", async () =>
+  test("produce-consume(video)", async () =>
     new Promise<void>(async (done) => {
       const port = await randomPort();
 
@@ -48,7 +48,7 @@ describe("media", () => {
       client.onProduceMedia.subscribe(async (target) => {
         const track = (await client.consume(target)).track;
         expect(client.recvTransport.pc.getTransceivers().length).toBe(2); // mid 0 & mid probator
-        track.onReceiveRtp.subscribe(async () => {
+        track.onReceiveRtp.subscribe(async (rtp) => {
           try {
             udp.close();
             child.kill("SIGKILL");

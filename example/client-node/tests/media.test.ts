@@ -226,6 +226,12 @@ describe("media", () => {
       const client = await new Client(socket, {
         codecs: {
           video: [
+            // new RTCRtpCodecParameters({
+            //   mimeType: "video/H264",
+            //   clockRate: 90000,
+            //   rtcpFeedback: [useFIR(), useNACK(), usePLI(), useREMB()],
+            //   parameters:"level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f",
+            // }),
             new RTCRtpCodecParameters({
               mimeType: "video/VP8",
               clockRate: 90000,

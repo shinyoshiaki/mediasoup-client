@@ -7,6 +7,7 @@ import {
   MediaStreamTrack,
   RTCRtpCodecParameters,
   RTCRtpHeaderExtensionParameters,
+  codecParametersFromString,
 } from "werift";
 import * as utils from "../utils";
 import * as sdpTransform from "sdp-transform";
@@ -115,13 +116,24 @@ export class Werift extends HandlerInterface {
     let preferredPayloadType = 96;
     const codecs: RtpCodecCapability[] = [
       ...(this.nativeRtpCapabilities.codecs.video || []).map(
-        ({ mimeType, clockRate, rtcpFeedback }) => {
+        ({ mimeType, clockRate, rtcpFeedback ,parameters}) => {
+          const obj:any=parameters? codecParametersFromString(parameters):{}
+          for(const key of Object.keys(obj)){
+            try {
+              const n=Number(obj[key]) 
+              if(!Number.isNaN(n)){
+                obj[key]=n
+              }
+            } catch (error) {
+            }
+          }
           const codec: RtpCodecCapability = {
             kind: "video",
             mimeType,
             clockRate,
             rtcpFeedback,
             preferredPayloadType: preferredPayloadType++,
+            parameters:obj,
           };
           return codec;
         }

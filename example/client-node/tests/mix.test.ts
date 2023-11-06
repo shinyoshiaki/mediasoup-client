@@ -113,11 +113,11 @@ describe("mix", () => {
         {
           const track = new MediaStreamTrack({ kind: "audio" });
           await client.publishMedia(track as any);
-          const audioRtp = new RtpBuilder();
+          const audioRtp = new RtpBuilder({between:20, clockRate:48000});
           setInterval(() => {
             const rtp = audioRtp.create(Buffer.from("audio"));
             track.writeRtp(rtp);
-          }, 1000 / 30);
+          }, 20);
         }
 
         expect(client.sendTransport.pc.getTransceivers().length).toBe(2);

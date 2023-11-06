@@ -203,6 +203,8 @@ export class Client {
     await this.device.load({
       routerRtpCapabilities,
     });
+    const { rtpCapabilities } = this.device;
+    console.log("rtpCapabilities", rtpCapabilities);
   };
 
   consume = async (target: string) => {

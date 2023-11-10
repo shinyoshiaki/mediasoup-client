@@ -1082,6 +1082,16 @@ function matchCodecs(
 		{
 			const aPacketizationMode = aCodec.parameters['packetization-mode'] || 0;
 			const bPacketizationMode = bCodec.parameters['packetization-mode'] || 0;
+			const aAsymmetry = aCodec.parameters['level-asymmetry-allowed'] || 1;
+			const bAsymmetry = bCodec.parameters['level-asymmetry-allowed'] || 1;
+
+			if (aPacketizationMode !== bPacketizationMode)
+			{ return false; }
+			
+			if (aAsymmetry!==bAsymmetry)
+			{
+				return false;
+			}
 
 			if (aPacketizationMode !== bPacketizationMode)
 			{ return false; }

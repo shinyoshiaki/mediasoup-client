@@ -222,7 +222,7 @@ export class Werift extends HandlerInterface {
       ),
     };
 
-    this._pc = new RTCPeerConnection({
+    const peerConfig={      
       iceServers: iceServers || [],
       iceTransportPolicy: iceTransportPolicy || "all",
       bundlePolicy: "max-bundle",
@@ -230,7 +230,9 @@ export class Werift extends HandlerInterface {
       sdpSemantics: "unified-plan",
       ...this.nativeRtpCapabilities,
       ...additionalSettings,
-    });
+    }
+    logger.debug("run() | calling new RTCPeerConnection()",peerConfig);
+    this._pc = new RTCPeerConnection(peerConfig);
 
     // Handle RTCPeerConnection connection status.
     this._pc.connectionStateChange.subscribe((state) => {

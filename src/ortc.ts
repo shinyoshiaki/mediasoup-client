@@ -972,7 +972,7 @@ export function reduceCodecs(
 	{
 		for (let idx = 0; idx < codecs.length; ++idx)
 		{
-			if (matchCodecs(codecs[idx], capCodec,{strict:true}))
+			if (matchCodecs(codecs[idx], capCodec, { strict: true }))
 			{
 				filteredCodecs.push(codecs[idx]);
 

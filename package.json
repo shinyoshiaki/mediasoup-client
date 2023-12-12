@@ -1,6 +1,6 @@
 {
   "name": "msc-node",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "mediasoup client side Node.js library",
   "keywords": [
     "webrtc",

@@ -231,7 +231,7 @@ export class Werift extends HandlerInterface {
       ...this.nativeRtpCapabilities,
       ...additionalSettings,
     }
-    logger.debug("run() | calling new RTCPeerConnection()",peerConfig);
+    logger.debug("run() | calling new RTCPeerConnection() peerConfig",peerConfig);
     this._pc = new RTCPeerConnection(peerConfig);
 
     // Handle RTCPeerConnection connection status.

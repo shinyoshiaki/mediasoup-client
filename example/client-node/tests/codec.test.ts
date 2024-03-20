@@ -4,7 +4,7 @@ import {
   useNACK,
   usePLI,
   useREMB,
-} from "werift";
+} from "../../../src";
 import ffmpeg from "fluent-ffmpeg";
 import { socketPromise } from "../src/socket.io-promise";
 import { Client } from "../src/client";

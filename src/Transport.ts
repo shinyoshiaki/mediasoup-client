@@ -10,7 +10,7 @@ import { Consumer, ConsumerOptions } from './Consumer';
 import { DataProducer, DataProducerOptions } from './DataProducer';
 import { DataConsumer, DataConsumerOptions } from './DataConsumer';
 import { SctpParameters } from './SctpParameters';
-import { MediaStreamTrack, RTCPeerConnection } from 'werift';
+import { MediaStreamTrack, RTCPeerConnection } from './index';
 
 interface InternalTransportOptions extends TransportOptions
 {

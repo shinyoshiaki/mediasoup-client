@@ -1,10 +1,10 @@
 import process from 'process';
-import path from 'path';
+// import path from 'path';
 import os from 'os';
 import fs from 'fs';
 import { execSync } from 'child_process';
 
-const PKG = JSON.parse(fs.readFileSync('./package.json').toString());
+// const PKG = JSON.parse(fs.readFileSync('./package.json').toString());
 const IS_WINDOWS = os.platform() === 'win32';
 // const MAYOR_VERSION = PKG.version.split('.')[0];
 
@@ -113,27 +113,28 @@ async function run()
 
 function replaceVersion()
 {
-	logInfo('replaceVersion()');
+	return;
+	// logInfo('replaceVersion()');
 
-	const files = fs.readdirSync('lib',
-		{
-			withFileTypes : true,
-			recursive     : true
-		});
+	// const files = fs.readdirSync('lib',
+	// 	{
+	// 		withFileTypes : true,
+	// 		recursive     : true
+	// 	});
 
-	for (const file of files)
-	{
-		if (!file.isFile())
-		{
-			continue;
-		}
+	// for (const file of files)
+	// {
+	// 	if (!file.isFile())
+	// 	{
+	// 		continue;
+	// 	}
 
-		const filePath = path.join('lib', file.name);
-		const text = fs.readFileSync(filePath, { encoding: 'utf8' });
-		const result = text.replace(/__MEDIASOUP_CLIENT_VERSION__/g, PKG.version);
+	// 	const filePath = path.join('lib', file.name);
+	// 	const text = fs.readFileSync(filePath, { encoding: 'utf8' });
+	// 	const result = text.replace(/__MEDIASOUP_CLIENT_VERSION__/g, PKG.version);
 
-		fs.writeFileSync(filePath, result, { encoding: 'utf8' });
-	}
+	// 	fs.writeFileSync(filePath, result, { encoding: 'utf8' });
+	// }
 }
 
 function deleteLib()

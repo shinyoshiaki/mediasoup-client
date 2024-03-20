@@ -20,7 +20,7 @@ import { ReactNative } from './handlers/ReactNative';
 import { RtpCapabilities, MediaKind } from './RtpParameters';
 import { SctpCapabilities } from './SctpParameters';
 import { Werift } from './handlers/werift';
-import { RTCRtpCodecParameters, RTCRtpHeaderExtensionParameters } from 'werift';
+import { RTCRtpCodecParameters, RTCRtpHeaderExtensionParameters } from './index';
 
 const logger = new Logger('Device');
 

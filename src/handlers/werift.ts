@@ -8,7 +8,7 @@ import {
   RTCRtpCodecParameters,
   RTCRtpHeaderExtensionParameters,
   codecParametersFromString,
-} from "werift";
+} from "../index";
 import * as utils from "../utils";
 import * as sdpTransform from "sdp-transform";
 import * as sdpCommonUtils from "./sdp/commonUtils";

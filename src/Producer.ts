@@ -7,8 +7,7 @@ import {
 	RtpParameters,
 	RtpEncodingParameters
 } from './RtpParameters';
-import { RTCRtpSender } from 'werift/lib/webrtc/src/media/rtpSender';
-import { MediaStreamTrack } from 'werift';
+import { RTCRtpSender, MediaStreamTrack } from './index';
 
 export type ProducerOptions =
 {

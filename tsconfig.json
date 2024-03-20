@@ -5,12 +5,12 @@
 			"es2020",
 			"dom"
 		],
-		"target": "es2015",
+		"target": "es2020",
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"esModuleInterop": true,
-		"isolatedModules": true,
-		"strict": true,
+		"isolatedModules": false,
+		"strict": false,
 		"outDir": "lib",
 		"declaration": true,
 		"declarationMap": true

@@ -29,7 +29,6 @@
     "build": "npm run release:check",
     "coverage": "node npm-scripts.mjs coverage",
     "e2e": "cd example/client-node && npm run test",
-    "install-deps": "node npm-scripts.mjs install-deps",
     "lint": "node npm-scripts.mjs lint",
     "prepare": "node npm-scripts.mjs prepare",
     "release": "node npm-scripts.mjs release && npm publish",

@@ -1,0 +1,3 @@
+[submodule "submodules/werift"]
+	path = submodules/werift
+	url = https://github.com/shinyoshiaki/werift-webrtc.git

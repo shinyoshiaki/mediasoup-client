@@ -81,12 +81,16 @@ describe("media", () => {
       client.onProduceMedia.subscribe(async (target) => {
         const consumer = await client.consume(target);
         expect(
-          client.recvTransport.pc.getTransceivers().map((t) => t.currentDirection)
+          client.recvTransport.pc
+            .getTransceivers()
+            .map((t) => t.currentDirection)
         ).toEqual(["recvonly", "recvonly"]);
         await client.unConsume(consumer);
         await new Promise((r) => setTimeout(r, 10));
         expect(
-          client.recvTransport.pc.getTransceivers().map((t) => t.currentDirection)
+          client.recvTransport.pc
+            .getTransceivers()
+            .map((t) => t.currentDirection)
         ).toEqual(["inactive", "recvonly"]);
         socket.close();
         await new Promise((r) => setTimeout(r, waitFor));
@@ -132,11 +136,11 @@ describe("media", () => {
       const track = new MediaStreamTrack({ kind: "audio" });
       await client.publishMedia(track as any);
       expect(client.sendTransport.pc.getTransceivers().length).toBe(1);
-      const audioRtp = new RtpBuilder();
+      const audioRtp = new RtpBuilder({ between: 20, clockRate: 48000 });
       setInterval(() => {
         const rtp = audioRtp.create(Buffer.from("audio"));
         track.writeRtp(rtp);
-      }, 1000 / 30);
+      }, 20);
     }));
 
   test("produce(audio) produce(audio) consume consume", async () =>
@@ -179,20 +183,20 @@ describe("media", () => {
       {
         const track = new MediaStreamTrack({ kind: "audio" });
         await client.publishMedia(track as any);
-        const audioRtp = new RtpBuilder();
+        const audioRtp = new RtpBuilder({ between: 20, clockRate: 48000 });
         setInterval(() => {
           const rtp = audioRtp.create(Buffer.from("1"));
           track.writeRtp(rtp);
-        }, 1000 / 30);
+        }, 20);
       }
       {
         const track = new MediaStreamTrack({ kind: "audio" });
         await client.publishMedia(track as any);
-        const audioRtp = new RtpBuilder();
+        const audioRtp = new RtpBuilder({ between: 20, clockRate: 48000 });
         setInterval(() => {
           const rtp = audioRtp.create(Buffer.from("2"));
           track.writeRtp(rtp);
-        }, 1000 / 30);
+        }, 20);
       }
 
       expect(client.sendTransport.pc.getTransceivers().length).toBe(2);
@@ -284,11 +288,11 @@ describe("media", () => {
       {
         const track = new MediaStreamTrack({ kind: "audio" });
         await client.publishMedia(track as any);
-        const audioRtp = new RtpBuilder();
+        const audioRtp = new RtpBuilder({ between: 20, clockRate: 48000 });
         setInterval(() => {
           const rtp = audioRtp.create(Buffer.from("audio"));
           track.writeRtp(rtp);
-        }, 1000 / 30);
+        }, 20);
       }
 
       client;

@@ -1,4 +1,4 @@
-import { MediaStreamTrack } from "werift";
+import { MediaStreamTrack } from "../../../src";
 import {
   RTCRtpCodecParameters,
   useAbsSendTime,

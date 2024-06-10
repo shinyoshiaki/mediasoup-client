@@ -20,7 +20,8 @@
     "rx.mini": "^1.1.0",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.2.0",
-    "msc-node": "^0.0.15"
+    "msc-node": "^0.0.15",
+    "werift": "^0.18.9"
   },
   "devDependencies": {
     "@types/fluent-ffmpeg": "^2.1.23",

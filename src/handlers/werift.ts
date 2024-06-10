@@ -8,7 +8,7 @@ import {
   RTCRtpCodecParameters,
   RTCRtpHeaderExtensionParameters,
   codecParametersFromString,
-} from "werift";
+} from "../index";
 import * as utils from "../utils";
 import * as sdpTransform from "sdp-transform";
 import * as sdpCommonUtils from "./sdp/commonUtils";
@@ -222,7 +222,7 @@ export class Werift extends HandlerInterface {
       ),
     };
 
-    this._pc = new RTCPeerConnection({
+    const peerConfig={      
       iceServers: iceServers || [],
       iceTransportPolicy: iceTransportPolicy || "all",
       bundlePolicy: "max-bundle",
@@ -230,7 +230,9 @@ export class Werift extends HandlerInterface {
       sdpSemantics: "unified-plan",
       ...this.nativeRtpCapabilities,
       ...additionalSettings,
-    });
+    }
+    logger.debug("run() | calling new RTCPeerConnection() peerConfig",peerConfig);
+    this._pc = new RTCPeerConnection(peerConfig);
 
     // Handle RTCPeerConnection connection status.
     this._pc.connectionStateChange.subscribe((state) => {

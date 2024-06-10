@@ -972,7 +972,7 @@ export function reduceCodecs(
 	{
 		for (let idx = 0; idx < codecs.length; ++idx)
 		{
-			if (matchCodecs(codecs[idx], capCodec))
+			if (matchCodecs(codecs[idx], capCodec, { strict: true }))
 			{
 				filteredCodecs.push(codecs[idx]);
 
@@ -1080,11 +1080,18 @@ function matchCodecs(
 	{
 		case 'video/h264':
 		{
-			const aPacketizationMode = aCodec.parameters['packetization-mode'] || 0;
-			const bPacketizationMode = bCodec.parameters['packetization-mode'] || 0;
+			const aPacketizationMode = aCodec.parameters['packetization-mode'] ?? 0;
+			const bPacketizationMode = bCodec.parameters['packetization-mode'] ?? 0;
+			const aAsymmetry = aCodec.parameters['level-asymmetry-allowed'] ?? 1;
+			const bAsymmetry = bCodec.parameters['level-asymmetry-allowed'] ?? 1;
 
 			if (aPacketizationMode !== bPacketizationMode)
 			{ return false; }
+			
+			if (aAsymmetry!==bAsymmetry)
+			{
+				return false;
+			}
 
 			// If strict matching check profile-level-id.
 			if (strict)

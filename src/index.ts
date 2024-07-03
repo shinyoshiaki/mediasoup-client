@@ -21,3 +21,4 @@ export { Device, detectDevice };
  */
 export { parse as parseScalabilityMode } from './scalabilityModes';
 export * from '../submodules/werift/packages/webrtc/src';
+export * from '../submodules/werift/packages/webrtc/src/nonstandard';

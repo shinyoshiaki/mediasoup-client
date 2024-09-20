@@ -36,6 +36,7 @@
     "server": "cd example/server && DEBUG=* npm run dev",
     "test": "node npm-scripts.mjs test",
     "typescript:build": "node npm-scripts.mjs typescript:build",
+    "type": "tsc --noEmit",
     "typescript:watch": "node npm-scripts.mjs typescript:watch"
   },
   "jest": {
